@@ -563,17 +563,44 @@ function renderDashboardAgenda(filteredPackages){
 }
 
 function renderDashboard(){
-  applyAll(); const a=filtered();
-  const has=document.getElementById('search').value||document.getElementById('filterStatus').value||document.getElementById('filterUnit').value;
-  document.getElementById('kpiJumlah').textContent=has?a.length:DATA.summary.jumlah;
-  document.getElementById('kpiJumlahHint').textContent=has?'sesuai filter aktif':'berdasarkan Rekap Excel';
-  document.getElementById('kpiPenawaran').textContent=compact(has?a.reduce((s,x)=>s+x.penawaran,0):DATA.summary.penawaran);
-  const nilaiKontrak=(has?a.reduce((s,x)=>s+Number(x.negosiasi||0),0):P.reduce((s,x)=>s+Number(x.negosiasi||0),0));
-  document.getElementById('kpiKontrak').textContent=compact(nilaiKontrak);
-  document.getElementById('kpiRbps').textContent=compact(has?a.reduce((s,x)=>s+x.rbps,0):DATA.summary.rbps);
-  document.getElementById('kpiLaba').textContent=compact(has?a.reduce((s,x)=>s+x.laba,0):DATA.summary.laba);
+  applyAll();
+  const a=filtered();
+
+  const has=document.getElementById('search').value ||
+             document.getElementById('filterStatus').value ||
+             document.getElementById('filterUnit').value;
+
+  const sum=(field)=>{
+    return a.reduce((total,x)=>{
+      return total + Number(x[field] || 0);
+    },0);
+  };
+
+  document.getElementById('kpiJumlah').textContent=a.length;
+
+  document.getElementById('kpiJumlahHint').textContent=
+    has ? 'sesuai filter aktif' : 'berdasarkan data Google Sheets';
+
+  document.getElementById('kpiPenawaran').textContent=
+    compact(sum('penawaran'));
+
+  const nilaiKontrak=sum('negosiasi') || sum('hasilNegosiasi');
+
+  document.getElementById('kpiKontrak').textContent=
+    compact(nilaiKontrak);
+
+  document.getElementById('kpiRbps').textContent=
+    compact(sum('rbps'));
+
+  document.getElementById('kpiLaba').textContent=
+    compact(sum('laba'));
+
   renderDashboardAgenda(a);
-  document.getElementById('dashboardBody').innerHTML=a.length?a.map(rowHTML).join(''):`<tr><td colspan="12"><div class="empty">Tidak ada paket sesuai filter.</div></td></tr>`;
+
+  document.getElementById('dashboardBody').innerHTML=
+    a.length
+      ? a.map(rowHTML).join('')
+      : '<tr><td colspan="12"><div class="empty">Tidak ada paket sesuai filter.</div></td></tr>';
 }
 function formatDateID(s){
   if(!s) return '';
