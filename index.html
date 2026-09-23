@@ -389,15 +389,103 @@ let logs=[];
 let currentNo=null,currentPersonIndex=null,detailNo=null,scheduleEditIndex=null,scheduleEditNo=null;
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
-function load() {
+async function load(){
   try {
-    const saved=localStorage.getItem(KEY);
-    if(saved) P=JSON.parse(saved);
-    else P=clone(DATA.packages);
-    const l=localStorage.getItem(KEY+'_logs'); if(l) logs=JSON.parse(l);
-  } catch(e) { P=clone(DATA.packages); logs=[]; }
-  P.forEach(x=>{x.status=normStatus(x.status); if(!Array.isArray(x.statusHistory)) x.statusHistory=[{date:todayISO(),status:x.status,note:'Status awal dari Excel'}]; if(!Array.isArray(x.personil))x.personil=[]; x.personil.forEach(p=>{if(!('cv' in p))p.cv=null}); if(!x.rab)x.rab=null; if(!x.rbp)x.rbp=null;});
-  applyAll();
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxs2CNPLIGsrQWmQ8jVpsII7jHqDGV0TfTqMT8YwnkhIFbUQaRRcfmGdjsh2MqIt1Dv/exec');
+
+    if (!response.ok) {
+      throw new Error('API gagal diakses');
+    }
+
+    const result = await response.json();
+
+    if (!result.success || !Array.isArray(result.data)) {
+      throw new Error('Format data API tidak sesuai');
+    }
+
+    P = result.data.map(row => ({
+      no: Number(row.NO || 0),
+      sourceNo: Number(row.NO || 0),
+      nama: row.NAMA_PAKET || '',
+      provinsi: row.PROVINSI || '',
+      lokasi: row.LOKASI || '',
+      unit: row.UNIT || '',
+      pagu: Number(row.PAGU || 0),
+      penawaran: Number(row.PENAWARAN || 0),
+      tanpaPPN: Number(row.TANPA_PPN || 0),
+      hasilNegosiasi: Number(row.HASIL_NEGOSIASI || 0),
+      rbps: Number(row.RBPS || 0),
+      rbpsPersen: Number(row.RBPS_PERSEN || 0),
+      laba: Number(row.LABA || 0),
+      labaPersen: Number(row.LABA_PERSEN || 0),
+      ahli: Number(row.JUMLAH_AHLI || 0),
+      pendukung: Number(row.JUMLAH_PENDUKUNG || 0),
+      status: normStatus(row.STATUS || ''),
+      statusHistory: [],
+      personil: [],
+      jadwal: row.JADWAL_LELANG || '',
+      catatan: row.CATATAN || ''
+    }));
+
+    P.forEach(x => {
+      x.status = normStatus(x.status);
+
+      if (!Array.isArray(x.statusHistory)) {
+        x.statusHistory = [{
+          date: todayISO(),
+          status: x.status,
+          note: 'Status dari Google Sheets'
+        }];
+      }
+
+      if (!Array.isArray(x.personil)) {
+        x.personil = [];
+      }
+    });
+
+    applyAll();
+
+    console.log('Berhasil mengambil ' + P.length + ' paket dari Google Sheets.');
+
+  } catch(e) {
+    console.error('API gagal:', e);
+
+    const saved = localStorage.getItem(KEY);
+
+    if(saved) {
+      P = JSON.parse(saved);
+    } else {
+      P = clone(DATA.packages);
+    }
+
+    const l = localStorage.getItem(KEY + '_logs');
+
+    if(l) {
+      logs = JSON.parse(l);
+    } else {
+      logs = [];
+    }
+
+    P.forEach(x => {
+      x.status = normStatus(x.status);
+
+      if(!Array.isArray(x.statusHistory)) {
+        x.statusHistory = [{
+          date: todayISO(),
+          status: x.status,
+          note: 'Status awal dari Excel'
+        }];
+      }
+
+      if(!Array.isArray(x.personil)) {
+        x.personil = [];
+      }
+    });
+
+    applyAll();
+
+    console.warn('Dashboard menggunakan data cadangan karena API tidak dapat diakses.');
+  }
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(P));localStorage.setItem(KEY+'_logs',JSON.stringify(logs));}
 function addLog(action,x,note='',change=null){
@@ -777,6 +865,6 @@ renderAccount();
 const activeLogin=localStorage.getItem('agrinas_demo_login');
 if(activeLogin){document.body.classList.remove('logged-out');document.getElementById('loginScreen').style.display='none';}
 
-load();fillUnits();renderDashboard();renderManage();renderPersonil();renderLogs();
+load().then(()=>{fillUnits();renderDashboard();renderManage();renderPersonil();renderLogs();});
 </script>
 </body></html>
