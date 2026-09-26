@@ -421,26 +421,22 @@ async function load(){
       ahli: Number(row.JUMLAH_AHLI || 0),
       pendukung: Number(row.JUMLAH_PENDUKUNG || 0),
       status: normStatus(row.STATUS || ''),
-      statusHistory: [],
-      personil: Array.isArray(row.PERSONIL)
-  ? row.PERSONIL.map(p => ({
-      nama: p.nama || '',
-      jabatan: p.jabatan || '',
-      posisi: p.posisi || '',
-      jenis: p.jenis || '',
-      noHp: p.noHp || '',
-      email: p.email || '',
-      cv: p.cvFileId
-        ? {
-            id: p.cvFileId,
-            name: p.cvFileName || '',
-            url: p.cvFileUrl || ''
-          }
-        : null
-    }))
-  : [],
-      jadwal: row.JADWAL_LELANG || '',
-      catatan: row.CATATAN || ''
+     statusHistory: [],
+personil: (Array.isArray(row.PERSONIL) ? row.PERSONIL : []).map(p => ({
+  nama: p.nama || '',
+  jabatan: p.jabatan || '',
+  posisi: p.posisi || '',
+  jenis: p.jenis || '',
+  noHp: p.noHp || '',
+  email: p.email || '',
+  cv: p.cvFileId ? {
+    id: p.cvFileId,
+    name: p.cvFileName || '',
+    url: p.cvFileUrl || ''
+  } : null
+})),
+jadwal: row.JADWAL_LELANG || '',
+catatan: row.CATATAN || ''
     }));
 
     P.forEach(x => {
