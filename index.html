@@ -670,7 +670,7 @@ function openPersonPackage(no){
   document.getElementById('personPackageSub').textContent=x.nama;
   document.getElementById('personPackageBody').innerHTML=`
     <div class="person-detail-head"><span><b>${people.length}</b> nama personil</span><div class="person-detail-actions"><button class="btn primary small" onclick="openPerson(${x.no})">＋ Tambah Personil</button><button class="btn secondary small" onclick="closeModal('personPackageModal');openEdit(${x.no})">✎ Edit Paket</button></div></div>
-    ${people.length?`<table><thead><tr><th>No</th><th>Jabatan / Posisi</th><th>Nama Personil</th><th>CV</th><th>Aksi</th></tr></thead><tbody>${people.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.jabatan)}</td><td><b>${esc(p.nama)}</b></td><td>${personCVHTML(x.no,i,p)}</td><td><button class="iconbtn edit" onclick="openPerson(${x.no},${i})">✎</button><button class="iconbtn del" onclick="deletePerson(${x.no},${i})">🗑</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:14px">Belum ada nama personil.</div>'}`;
+    ${people.length?`<table><thead><tr><th>No</th><th>Jabatan / Posisi</th><th>Nama Personil</th><th>CV</th><th>Aksi</th></tr></thead><tbody>${people.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.jabatan)}</td><td><b>${esc(p.nama)}</b></td><td>${personCVHTML(x.no,i,p)}</td><td><button class="iconbtn edit" onclick="openPerson(${x.no},${i})">✎</button><button class="iconbtn del"onclick="deletePerson(${x.no},'${p.idPersonil}')">🗑</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty" style="padding:14px">Belum ada nama personil.</div>'}`;
   document.getElementById('personPackageModal').style.display='block'; document.body.style.overflow='hidden';
 }
 
@@ -757,8 +757,7 @@ function openEdit(no){
 document.getElementById('editClose').onclick=()=>closeModal('editModal');document.getElementById('cancelEdit').onclick=()=>closeModal('editModal');
 function renderEditPeople(){
   const x=P.find(p=>p.no===currentNo);if(!x)return;updatePersonCountIndicator();
-  document.getElementById('editPeople').innerHTML=x.personil.length?`<table><thead><tr><th>No</th><th>Jabatan / Posisi</th><th>Nama Personil</th><th>CV</th><th>Aksi</th></tr></thead><tbody>${x.personil.map((p,i)=>`<tr class="personrow"><td>${i+1}</td><td>${esc(p.jabatan)}</td><td><b>${esc(p.nama)}</b></td><td>${personCVHTML(x.no,i,p)}</td><td><button class="iconbtn edit" onclick="openPerson(${x.no},${i})">✎</button><button class="iconbtn del" onclick="deletePerson(${x.no},${i})">🗑</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Belum ada nama personil.</div>';
-}
+  document.getElementById('editPeople').innerHTML=x.personil.length?`<table><thead><tr><th>No</th><th>Jabatan / Posisi</th><th>Nama Personil</th><th>CV</th><th>Aksi</th></tr></thead><tbody>${x.personil.map((p,i)=>`<tr class="personrow"><td>${i+1}</td><td>${esc(p.jabatan)}</td><td><b>${esc(p.nama)}</b></td><td>${personCVHTML(x.no,i,p)}</td><td><button class="iconbtn edit" onclick="openPerson(${x.no},${i})">✎</button><button class="iconbtn del" onclick="deletePerson(${x.no},'${p.idPersonil}')">🗑</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Belum ada nama personil.</div>';
 function formatDate(s){if(!s)return '-';return new Date(s+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}
 function renderHistory(){
   const x=P.find(p=>p.no===currentNo);if(!x)return;addInitialIfMissing(x);
@@ -1229,12 +1228,12 @@ document.getElementById('personSave').onclick = async () => {
 
   }
 };
-async function deletePerson(no, i) {
+async function deletePerson(no, idPersonil) {
 
   const x = P.find(p => p.no === no);
   if (!x) return;
 
-  const p = x.personil[i];
+ const p = x.personil.find(person => person.idPersonil === idPersonil);
   if (!p) return;
 
   if (!confirm('Hapus personil ini?')) return;
