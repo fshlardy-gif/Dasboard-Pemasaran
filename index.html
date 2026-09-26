@@ -437,7 +437,8 @@ logs = Array.isArray(result.logs)
       pendukung: Number(row.JUMLAH_PENDUKUNG || 0),
       status: normStatus(row.STATUS || ''),
      statusHistory: [],
-personil: (Array.isArray(row.PERSONIL) ? row.PERSONIL : []).map(p => ({
+  personil: (Array.isArray(row.PERSONIL) ? row.PERSONIL : []).map(p => ({
+  idPersonil: p.idPersonil || '',
   nama: p.nama || '',
   jabatan: p.jabatan || '',
   posisi: p.posisi || '',
