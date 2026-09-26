@@ -1105,8 +1105,214 @@ function updatePersonCountIndicator(){const x=P.find(p=>p.no===currentNo);if(!x)
 function openPerson(no,index=null){currentNo=no;currentPersonIndex=index;const x=P.find(p=>p.no===no);if(!x)return;const p=index==null?{jabatan:'',nama:'',cv:null}:x.personil[index];document.getElementById('personTitle').textContent=index==null?'Tambah Personil':'Edit Personil';document.getElementById('personSub').textContent=`Paket ${x.no} — ${x.nama}`;document.getElementById('personJabatan').value=p?.jabatan||'';document.getElementById('personNama').value=p?.nama||'';const cvBtn=document.getElementById('personCvDownloadBtn'),cvName=document.getElementById('personCvName');cvBtn.style.display=p?.cv?.data?'inline-flex':'none';cvName.textContent=p?.cv?.data?(p.cv.name||'CV tersedia'):'Belum ada CV.';document.getElementById('personModal').style.display='block';document.body.style.overflow='hidden'}
 function closePerson(){closeModal('personModal');currentPersonIndex=null}
 document.getElementById('personClose').onclick=closePerson;document.getElementById('personCancel').onclick=closePerson;document.getElementById('personCvUploadBtn').onclick=()=>{if(currentNo==null||currentPersonIndex==null){alert('Simpan personil terlebih dahulu sebelum mengunggah CV.');return}triggerCVUpload(currentNo,currentPersonIndex);setTimeout(()=>{const x=P.find(p=>p.no===currentNo),cv=x?.personil[currentPersonIndex]?.cv;document.getElementById('personCvDownloadBtn').style.display=cv?.data?'inline-flex':'none';document.getElementById('personCvName').textContent=cv?.data?(cv.name||'CV tersedia'):'Belum ada CV.'},400)};document.getElementById('personCvDownloadBtn').onclick=()=>{if(currentNo!=null&&currentPersonIndex!=null)downloadCV(currentNo,currentPersonIndex)};
-document.getElementById('personSave').onclick=()=>{const x=P.find(p=>p.no===currentNo);if(!x)return;const jab=document.getElementById('personJabatan').value.trim(),nama=document.getElementById('personNama').value.trim();if(!jab||!nama){alert('Jabatan dan nama wajib diisi.');return}if(currentPersonIndex==null)x.personil.push({jabatan:jab,nama,cv:null});else x.personil[currentPersonIndex]={jabatan:jab,nama,cv:x.personil[currentPersonIndex]?.cv||null};save();addLog(currentPersonIndex==null?'TAMBAH PERSONIL':'EDIT PERSONIL',x,'',{field:'Personil',before:currentPersonIndex==null?'-':`${x.personil[currentPersonIndex]?.jabatan||''} — ${x.personil[currentPersonIndex]?.nama||''}`,after:`${jab} — ${nama}`});closePerson();renderEditPeople();renderDashboard();renderManage();renderPersonil();if(detailNo===x.no&&document.getElementById('detailModal').style.display==='block')openDetail(x.no)};
-function deletePerson(no,i){const x=P.find(p=>p.no===no);if(!x)return;if(confirm('Hapus personil ini?')){const p=x.personil[i];x.personil.splice(i,1);save();addLog('HAPUS PERSONIL',x,'',{field:'Personil',before:p?`${p.jabatan} — ${p.nama}`:'-',after:'Dihapus'});renderEditPeople();renderDashboard();renderManage();renderPersonil();if(detailNo===x.no&&document.getElementById('detailModal').style.display==='block')openDetail(x.no)}}
+document.getElementById('personSave').onclick = async () => {
+
+  const x = P.find(p => p.no === currentNo);
+  if (!x) return;
+
+  const jab = document.getElementById('personJabatan').value.trim();
+  const nama = document.getElementById('personNama').value.trim();
+
+  if (!jab || !nama) {
+    alert('Jabatan dan nama wajib diisi.');
+    return;
+  }
+
+  const isEdit = currentPersonIndex != null;
+  const oldPerson = isEdit ? x.personil[currentPersonIndex] : null;
+
+  const account = getAccount();
+
+  const user = {
+    name: account?.name || 'Pengguna',
+    email: account?.username || '',
+    role: account?.role || ''
+  };
+
+  const personData = {
+    action: 'SAVE_PERSONIL',
+
+    ID_PERSONIL: oldPerson?.idPersonil || '',
+    ID_PAKET: 'PKT-' + String(x.no).padStart(3, '0'),
+
+    NAMA_PERSONIL: nama,
+    JABATAN: jab,
+
+    POSISI: oldPerson?.posisi || '',
+    JENIS_PERSONIL: oldPerson?.jenis || '',
+    NO_HP: oldPerson?.noHp || '',
+    EMAIL: oldPerson?.email || '',
+
+    CV_FILE_ID: oldPerson?.cv?.id || '',
+    CV_FILE_NAME: oldPerson?.cv?.name || '',
+    CV_FILE_URL: oldPerson?.cv?.url || '',
+    STATUS_CV: oldPerson?.cv ? 'ADA' : 'BELUM ADA',
+
+    mode: isEdit ? 'EDIT' : 'SAVE',
+
+    user: user
+  };
+
+  try {
+
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbxMZWaeeQ_QS1J-ZCkR526UbJEiVXV-ItG_5Wax_6bw950Q7rne4-46-e2UFosf1sB8/exec',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(personData)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.message || 'Gagal menyimpan personil.'
+      );
+    }
+
+    const newPerson = {
+      idPersonil:
+        result.idPersonil ||
+        oldPerson?.idPersonil ||
+        '',
+
+      nama: nama,
+      jabatan: jab,
+
+      posisi: oldPerson?.posisi || '',
+      jenis: oldPerson?.jenis || '',
+      noHp: oldPerson?.noHp || '',
+      email: oldPerson?.email || '',
+
+      cv: oldPerson?.cv || null
+    };
+
+    if (isEdit) {
+      x.personil[currentPersonIndex] = newPerson;
+    } else {
+      x.personil.push(newPerson);
+    }
+
+    save();
+
+    closePerson();
+
+    renderEditPeople();
+    renderDashboard();
+    renderManage();
+    renderPersonil();
+
+    if (
+      detailNo === x.no &&
+      document.getElementById('detailModal').style.display === 'block'
+    ) {
+      openDetail(x.no);
+    }
+
+    alert(
+      isEdit
+        ? 'Personil berhasil diperbarui dan tersimpan ke Google Sheets.'
+        : 'Personil berhasil ditambahkan dan tersimpan ke Google Sheets.'
+    );
+
+  } catch (error) {
+
+    alert(
+      'Gagal menyimpan personil ke Google Sheets.\n\n' +
+      error.message
+    );
+
+  }
+};
+async function deletePerson(no, i) {
+
+  const x = P.find(p => p.no === no);
+  if (!x) return;
+
+  const p = x.personil[i];
+  if (!p) return;
+
+  if (!confirm('Hapus personil ini?')) return;
+
+  if (!p.idPersonil) {
+    alert('ID personil tidak ditemukan. Data belum dapat dihapus.');
+    return;
+  }
+
+  const account = getAccount();
+
+  const user = {
+    name: account?.name || 'Pengguna',
+    email: account?.username || '',
+    role: account?.role || ''
+  };
+
+  try {
+
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbxMZWaeeQ_QS1J-ZCkR526UbJEiVXV-ItG_5Wax_6bw950Q7rne4-46-e2UFosf1sB8/exec',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+
+          action: 'SAVE_PERSONIL',
+          mode: 'DELETE',
+
+          ID_PERSONIL: p.idPersonil,
+
+          ID_PAKET:
+            'PKT-' + String(no).padStart(3, '0'),
+
+          user: user
+
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.message || 'Gagal menghapus personil.'
+      );
+    }
+
+    x.personil.splice(i, 1);
+
+    save();
+
+    renderEditPeople();
+    renderDashboard();
+    renderManage();
+    renderPersonil();
+
+    if (
+      detailNo === x.no &&
+      document.getElementById('detailModal').style.display === 'block'
+    ) {
+      openDetail(x.no);
+    }
+
+    alert(
+      'Personil berhasil dihapus dan perubahan tercatat di Google Sheets.'
+    );
+
+  } catch (error) {
+
+    alert(
+      'Gagal menghapus personil dari Google Sheets.\n\n' +
+      error.message
+    );
+
+  }
+}
 
 document.getElementById('detailStatusBtn').onclick=()=>{closeModal('detailModal');openEdit(detailNo)};
 document.getElementById('detailPersonBtn').onclick=()=>openPerson(detailNo);
