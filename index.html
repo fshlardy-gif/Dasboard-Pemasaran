@@ -744,23 +744,281 @@ document.getElementById('addSchedule').onclick=()=>{
   x.status=currentStatus(x);save();addLog('JADWAL STATUS',x,note||'', {field:'Jadwal / Status',before:ex?`${formatDate(ex.date)} → ${normStatus(ex.status)}`:'Belum ada jadwal',after:`${formatDate(date)} → ${status}`});renderHistory();renderDashboard();renderManage();
   alert(date>todayISO()?'Jadwal tersimpan. Status akan berubah otomatis saat tanggal tersebut tiba.':'Status hari ini berhasil diperbarui.');
 };
-document.getElementById('saveEdit').onclick=()=>{
-  const x=P.find(p=>p.no===currentNo);if(!x)return;
-  const target=Math.max(0,Math.round(parseEditNumber(document.getElementById('eAhli').value)));
-  if(x.personil.length!==target){updatePersonCountIndicator();alert(`Tidak dapat menyimpan. Jumlah personil wajib ${target} orang, tetapi saat ini baru ${x.personil.length} orang.`);return}
+
+  document.getElementById('saveEdit').onclick=async()=>{
+  const oldNo=currentNo;
+  const x=P.find(p=>p.no===oldNo);
+
+  if(!x)return;
+
+  const target=Math.max(
+    0,
+    Math.round(
+      parseEditNumber(document.getElementById('eAhli').value)
+    )
+  );
+
+  if(x.personil.length!==target){
+    updatePersonCountIndicator();
+
+    alert(
+      `Tidak dapat menyimpan. Jumlah personil wajib ${target} orang, ` +
+      `tetapi saat ini baru ${x.personil.length} orang.`
+    );
+
+    return;
+  }
+
   const old=clone(x);
-  x.no=Number(document.getElementById('eNo').value);x.nama=document.getElementById('eNama').value.trim();x.provinsi=document.getElementById('eProvinsi').value.trim();x.lokasi=document.getElementById('eLokasi').value.trim();x.unit=document.getElementById('eUnit').value;x.status=normStatus(document.getElementById('eStatus').value);x.pagu=parseEditNumber(document.getElementById('ePagu').value);x.penawaran=parseEditNumber(document.getElementById('ePenawaran').value);x.tanpaPPN=parseEditNumber(document.getElementById('eTanpa').value);x.negosiasi=parseEditNumber(document.getElementById('eNegosiasi').value);x.rbps=parseEditNumber(document.getElementById('eRbps').value);x.rbpsPct=parseEditNumber(document.getElementById('eRbpsPct').value)/100;x.laba=parseEditNumber(document.getElementById('eLaba').value);x.labaPct=parseEditNumber(document.getElementById('eLabaPct').value)/100;x.ahli=parseEditNumber(document.getElementById('eAhli').value);x.pendukung=parseEditNumber(document.getElementById('ePendukung').value);
-  if(!x.nama||!x.unit){alert('Nama paket dan unit wajib diisi.');return}
-  if(x.personil.length!==x.ahli){alert(`Jumlah personil belum sesuai. Tenaga Ahli = ${x.ahli}, tetapi daftar personil = ${x.personil.length}. Tambahkan/hapus personil sampai jumlahnya sama sebelum menyimpan.`);return}
-  const oldStatus=currentStatus(old),newStatus=currentStatus(x);addInitialIfMissing(x);
-  if(oldStatus!==x.status)x.statusHistory.push({date:todayISO(),status:x.status,note:'Perubahan status dari Edit Paket',createdAt:new Date().toISOString()});
+
+  x.no=Number(document.getElementById('eNo').value);
+  x.nama=document.getElementById('eNama').value.trim();
+  x.provinsi=document.getElementById('eProvinsi').value.trim();
+  x.lokasi=document.getElementById('eLokasi').value.trim();
+  x.unit=document.getElementById('eUnit').value;
+  x.status=normStatus(document.getElementById('eStatus').value);
+
+  x.pagu=parseEditNumber(document.getElementById('ePagu').value);
+  x.penawaran=parseEditNumber(document.getElementById('ePenawaran').value);
+  x.tanpaPPN=parseEditNumber(document.getElementById('eTanpa').value);
+  x.negosiasi=parseEditNumber(document.getElementById('eNegosiasi').value);
+  x.rbps=parseEditNumber(document.getElementById('eRbps').value);
+
+  x.rbpsPct=
+    parseEditNumber(document.getElementById('eRbpsPct').value)/100;
+
+  x.laba=parseEditNumber(document.getElementById('eLaba').value);
+
+  x.labaPct=
+    parseEditNumber(document.getElementById('eLabaPct').value)/100;
+
+  x.ahli=parseEditNumber(document.getElementById('eAhli').value);
+  x.pendukung=parseEditNumber(document.getElementById('ePendukung').value);
+
+  if(!x.nama||!x.unit){
+    alert('Nama paket dan unit wajib diisi.');
+    return;
+  }
+
+  if(x.personil.length!==x.ahli){
+    alert(
+      `Jumlah personil belum sesuai. Tenaga Ahli = ${x.ahli}, ` +
+      `tetapi daftar personil = ${x.personil.length}.`
+    );
+    return;
+  }
+
+  const oldStatus=currentStatus(old);
+  const newStatus=x.status;
+
+  addInitialIfMissing(x);
+
+  if(oldStatus!==newStatus){
+    x.statusHistory.push({
+      date:todayISO(),
+      status:newStatus,
+      note:'Perubahan status dari Edit Paket',
+      createdAt:new Date().toISOString()
+    });
+  }
+
   const beforeEdit=old;
-  P=P.map(p=>p.no===currentNo?x:p);
+
   const changes=[];
-  const fields=[['Nama Paket','nama'],['Provinsi','provinsi'],['Lokasi','lokasi'],['Unit','unit'],['Status','status'],['Pagu Anggaran','pagu'],['Penawaran termasuk PPN','penawaran'],['Penawaran tanpa PPN','tanpaPPN'],['Hasil Negosiasi','negosiasi'],['RBPS','rbps'],['RBPS %','rbpsPct'],['Estimasi Laba','laba'],['Laba %','labaPct'],['Tenaga Ahli','ahli'],['Tenaga Pendukung','pendukung']];
-  fields.forEach(([label,key])=>{if(String(beforeEdit[key]??'')!==String(x[key]??'')){let fmt=v=>(['pagu','penawaran','tanpaPPN','negosiasi','rbps','laba'].includes(key)?rp(v):(['rbpsPct','labaPct'].includes(key)?((Number(v||0)).toFixed(2).replace('.',',')+'%'):String(v??'-')));changes.push({field:label,before:fmt(beforeEdit[key]),after:fmt(x[key])});}});
-  if(changes.length){changes.forEach(c=>addLog('EDIT PAKET',x,'',c));}else addLog('EDIT PAKET',x,'Tidak ada perubahan data');
-  save();currentNo=x.no;closeModal('editModal');fillUnits();renderDashboard();renderManage();renderPersonil();
+
+  const fields=[
+    ['Nama Paket','nama'],
+    ['Provinsi','provinsi'],
+    ['Lokasi','lokasi'],
+    ['Unit','unit'],
+    ['Status','status'],
+    ['Pagu Anggaran','pagu'],
+    ['Penawaran termasuk PPN','penawaran'],
+    ['Penawaran tanpa PPN','tanpaPPN'],
+    ['Hasil Negosiasi','negosiasi'],
+    ['RBPS','rbps'],
+    ['RBPS %','rbpsPct'],
+    ['Estimasi Laba','laba'],
+    ['Laba %','labaPct'],
+    ['Tenaga Ahli','ahli'],
+    ['Tenaga Pendukung','pendukung']
+  ];
+
+  fields.forEach(([label,key])=>{
+    if(
+      String(beforeEdit[key]??'') !==
+      String(x[key]??'')
+    ){
+      let fmt=v=>(
+        [
+          'pagu',
+          'penawaran',
+          'tanpaPPN',
+          'negosiasi',
+          'rbps',
+          'laba'
+        ].includes(key)
+          ? rp(v)
+          : (
+              ['rbpsPct','labaPct'].includes(key)
+                ? (
+                    Number(v||0)
+                      .toFixed(2)
+                      .replace('.',',')+'%'
+                  )
+                : String(v??'-')
+            )
+      );
+
+      changes.push({
+        field:label,
+        before:fmt(beforeEdit[key]),
+        after:fmt(x[key])
+      });
+    }
+  });
+
+  /*
+   * Ambil tanggal status terakhir
+   */
+  let tanggalStatus='';
+
+  if(Array.isArray(x.statusHistory) && x.statusHistory.length){
+
+    const sorted=[...x.statusHistory]
+      .filter(z=>z.date)
+      .sort((a,b)=>
+        String(a.date).localeCompare(String(b.date))
+      );
+
+    if(sorted.length){
+      tanggalStatus=sorted[sorted.length-1].date;
+    }
+  }
+
+  /*
+   * User yang sedang login
+   */
+  const account=getAccount();
+
+  const user={
+    name:account.name||'Pengguna',
+    email:account.username||'',
+    role:account.role||''
+  };
+
+  /*
+   * Kirim perubahan ke Google Sheets
+   */
+  try{
+
+    const response=await fetch(
+      'https://script.google.com/macros/s/AKfycbxMZWaeeQ_QS1J-ZCkR526UbJEiVXV-ItG_5Wax_6bw950Q7rne4-46-e2UFosf1sB8/exec',
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'text/plain;charset=utf-8'
+        },
+        body:JSON.stringify({
+
+          action:'UPDATE',
+
+          /*
+           * PENTING:
+           * gunakan ID paket LAMA
+           */
+          ID_PAKET:
+            'PKT-'+String(oldNo).padStart(3,'0'),
+
+          NAMA_PAKET:x.nama,
+          PROVINSI:x.provinsi,
+          LOKASI:x.lokasi,
+          UNIT:x.unit,
+
+          PAGU:x.pagu,
+          PENAWARAN:x.penawaran,
+          TANPA_PPN:x.tanpaPPN,
+          HASIL_NEGOSIASI:x.negosiasi,
+
+          RBPS:x.rbps,
+          RBPS_PERSEN:x.rbpsPct,
+
+          LABA:x.laba,
+          LABA_PERSEN:x.labaPct,
+
+          JUMLAH_AHLI:x.ahli,
+          JUMLAH_PENDUKUNG:x.pendukung,
+
+          STATUS:x.status,
+          TANGGAL_STATUS:tanggalStatus,
+
+          JADWAL_LELANG:x.jadwal||'',
+          CATATAN:x.catatan||'',
+
+          user:user
+        })
+      }
+    );
+
+    const result=await response.json();
+
+    if(!result.success){
+      throw new Error(
+        result.message||'Google Sheets gagal diperbarui.'
+      );
+    }
+
+    /*
+     * Update lokal setelah Google Sheets berhasil
+     */
+    P=P.map(p=>p.no===oldNo?x:p);
+
+    if(changes.length){
+      changes.forEach(c=>
+        addLog(
+          'EDIT PAKET',
+          x,
+          '',
+          c
+        )
+      );
+    }else{
+      addLog(
+        'EDIT PAKET',
+        x,
+        'Tidak ada perubahan data'
+      );
+    }
+
+    save();
+
+    currentNo=x.no;
+
+    closeModal('editModal');
+
+    fillUnits();
+    renderDashboard();
+    renderManage();
+    renderPersonil();
+
+    alert(
+      'Berhasil! Perubahan paket sudah tersimpan ke Google Sheets.'
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    /*
+     * Kembalikan data lokal jika Google Sheets gagal
+     */
+    P=P.map(p=>p.no===oldNo?old:p);
+
+    alert(
+      'Gagal menyimpan ke Google Sheets.\n\n'+
+      error.message
+    );
+  }
 };
 document.getElementById('deleteEdit').onclick=()=>{if(currentNo!=null)deletePackage(currentNo)};
 
