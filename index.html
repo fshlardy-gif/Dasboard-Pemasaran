@@ -398,7 +398,22 @@ async function load(){
     }
 
     const result = await response.json();
-
+logs = Array.isArray(result.logs)
+  ? result.logs.map(l => ({
+      time: l.WAKTU || '',
+      user: l.USER_NAMA || l.USER_EMAIL || 'Pengguna',
+      role: l.USER_EMAIL || '',
+      action: l.AKSI || '',
+      paket: `${l.ID_PAKET || ''} — ${l.NAMA_PAKET || ''}`,
+      status: '',
+      change: {
+        field: l.FIELD_DIUBAH || '',
+        before: l.NILAI_SEBELUMNYA ?? '-',
+        after: l.NILAI_SESUDAHNYA ?? '-'
+      },
+      note: l.KETERANGAN || ''
+    }))
+  : [];
     if (!result.success || !Array.isArray(result.data)) {
       throw new Error('Format data API tidak sesuai');
     }
