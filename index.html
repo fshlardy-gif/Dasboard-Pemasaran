@@ -1118,8 +1118,134 @@ document.getElementById('clearLog').onclick=()=>{if(confirm('Hapus semua log dem
 
 function openAdd(){showPage('tambah');document.getElementById('addForm').reset();document.getElementById('addNo').value=Math.max(0,...P.map(x=>x.no))+1}
 document.getElementById('goAdd').onclick=openAdd;document.getElementById('goAdd2').onclick=openAdd;
-document.getElementById('addForm').onsubmit=e=>{e.preventDefault();const x={no:Number(addNo.value),nama:addNama.value.trim(),provinsi:addProvinsi.value.trim(),lokasi:addLokasi.value.trim(),unit:addUnit.value.trim(),status:addStatus.value,pagu:Number(addPagu.value)||0,penawaran:Number(addPenawaran.value)||0,tanpaPPN:Number(addTanpa.value)||0,negosiasi:Number(addNegosiasi.value)||0,rbps:Number(addRbps.value)||0,rbpsPct:0,laba:Number(addLaba.value)||0,labaPct:0,ahli:Number(addAhli.value)||0,pendukung:Number(addPendukung.value)||0,personil:[],statusHistory:[{date:todayISO(),status:addStatus.value,note:'Paket baru'}]};if(!x.nama||!x.unit){alert('Nama dan unit wajib diisi.');return}const basis=x.tanpaPPN||x.penawaran;x.rbpsPct=basis?x.rbps/basis:0;x.labaPct=basis?x.laba/basis:0;if(P.some(p=>p.no===x.no)){alert('No paket sudah ada.');return}P.push(x);save();addLog('TAMBAH PAKET',x,'Paket baru');fillUnits();renderDashboard();renderManage();showPage('paket')};
+document.getElementById('addForm').onsubmit = async e => {
+  e.preventDefault();
 
+  const x = {
+    no: Number(addNo.value),
+    nama: addNama.value.trim(),
+    provinsi: addProvinsi.value.trim(),
+    lokasi: addLokasi.value.trim(),
+    unit: addUnit.value.trim(),
+    status: addStatus.value,
+    pagu: Number(addPagu.value) || 0,
+    penawaran: Number(addPenawaran.value) || 0,
+    tanpaPPN: Number(addTanpa.value) || 0,
+    negosiasi: Number(addNegosiasi.value) || 0,
+    rbps: Number(addRbps.value) || 0,
+    rbpsPct: 0,
+    laba: Number(addLaba.value) || 0,
+    labaPct: 0,
+    ahli: Number(addAhli.value) || 0,
+    pendukung: Number(addPendukung.value) || 0,
+    personil: [],
+    statusHistory: [
+      {
+        date: todayISO(),
+        status: addStatus.value,
+        note: 'Paket baru'
+      }
+    ]
+  };
+
+  if (!x.nama || !x.unit) {
+    alert('Nama dan unit wajib diisi.');
+    return;
+  }
+
+  const basis = x.tanpaPPN || x.penawaran;
+
+  x.rbpsPct = basis ? x.rbps / basis : 0;
+  x.labaPct = basis ? x.laba / basis : 0;
+
+  if (P.some(p => p.no === x.no)) {
+    alert('No paket sudah ada.');
+    return;
+  }
+
+  const account = getAccount();
+
+  const user = {
+    name: account.name || 'Pengguna',
+    email: account.username || '',
+    role: account.role || ''
+  };
+
+  try {
+
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbxMZWaeeQ_QS1J-ZCkR526UbJEiVXV-ItG_5Wax_6bw950Q7rne4-46-e2UFosf1sB8/exec',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          action: 'ADD',
+
+          NAMA_PAKET: x.nama,
+          PROVINSI: x.provinsi,
+          LOKASI: x.lokasi,
+          UNIT: x.unit,
+
+          PAGU: x.pagu,
+          PENAWARAN: x.penawaran,
+          TANPA_PPN: x.tanpaPPN,
+          HASIL_NEGOSIASI: x.negosiasi,
+
+          RBPS: x.rbps,
+          RBPS_PERSEN: x.rbpsPct,
+
+          LABA: x.laba,
+          LABA_PERSEN: x.labaPct,
+
+          JUMLAH_AHLI: x.ahli,
+          JUMLAH_PENDUKUNG: x.pendukung,
+
+          STATUS: x.status,
+          TANGGAL_STATUS: todayISO(),
+
+          JADWAL_LELANG: '',
+          CATATAN: '',
+
+          user: user
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.message || 'Gagal menambahkan paket.'
+      );
+    }
+
+    // Gunakan nomor yang dibuat oleh Google Sheets
+    x.no = Number(result.no || x.no);
+
+    P.push(x);
+
+    fillUnits();
+    renderDashboard();
+    renderManage();
+    showPage('paket');
+
+    alert(
+      'Berhasil! Paket ' +
+      result.idPaket +
+      ' sudah tersimpan ke Google Sheets.'
+    );
+
+  } catch (error) {
+
+    alert(
+      'Gagal menyimpan ke Google Sheets.\n\n' +
+      error.message
+    );
+
+  }
+};
 
 /* ===== Login demo ===== */
 const DEMO_USERS=[
