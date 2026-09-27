@@ -389,6 +389,18 @@ let logs=[];
 let currentNo=null,currentPersonIndex=null,detailNo=null,scheduleEditIndex=null,scheduleEditNo=null;
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
+  function parsePct(v){
+  if(v === null || v === undefined || v === '') return 0;
+  const s = String(v).trim();
+
+  if(s.includes('%')){
+    const n = parseFloat(s.replace('%','').replace(',','.'));
+    return Number.isFinite(n) ? n / 100 : 0;
+  }
+
+  const n = Number(s.replace(',','.'));
+  return Number.isFinite(n) ? n : 0;
+}
 async function load(){
   try {
     const response = await fetch('https://script.google.com/macros/s/AKfycbxMZWaeeQ_QS1J-ZCkR526UbJEiVXV-ItG_5Wax_6bw950Q7rne4-46-e2UFosf1sB8/exec');
@@ -430,9 +442,9 @@ logs = Array.isArray(result.logs)
       tanpaPPN: Number(row.TANPA_PPN || 0),
       hasilNegosiasi: Number(row.HASIL_NEGOSIASI || 0),
       rbps: Number(row.RBPS || 0),
-      rbpsPct: Number(row.RBPS_PERSEN || 0),
+      rbpsPct: parsePct(row.RBPS_PERSEN),
       laba: Number(row.LABA || 0),
-      labaPct: Number(row.LABA_PERSEN || 0),
+      labaPct: parsePct(row.LABA_PERSEN),
       ahli: Number(row.JUMLAH_AHLI || 0),
       pendukung: Number(row.JUMLAH_PENDUKUNG || 0),
       status: normStatus(row.STATUS || ''),
