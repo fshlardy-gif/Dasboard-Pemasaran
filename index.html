@@ -250,37 +250,139 @@ body.logged-out .app{display:none}
         </div>
       </div>
 
-      <div class="notice">
-        Dashboard Operasi berhasil dibuka.
-        Data operasi akan kita sambungkan pada tahap berikutnya.
+            <div class="notice">
+        Data operasional tersinkronisasi dari database operasi.
       </div>
 
       <div class="cards">
 
         <div class="card">
           <div class="label">Total Proyek</div>
-          <div class="value">TEST</div>
+          <div class="value">0</div>
         </div>
 
         <div class="card">
           <div class="label">Nilai Kontrak</div>
-          <div class="value">TEST</div>
+          <div class="value">Rp 0</div>
         </div>
 
         <div class="card">
           <div class="label">Pendapatan</div>
-          <div class="value">TEST</div>
+          <div class="value">Rp 0</div>
         </div>
 
         <div class="card">
           <div class="label">Cashflow</div>
-          <div class="value">TEST</div>
+          <div class="value">Rp 0</div>
         </div>
 
       </div>
 
-    </div>
 
+      <!-- FILTER OPERASI -->
+
+      <div class="panel" style="margin-top:20px;">
+
+        <div class="sectionhead">
+
+          <div>
+            <h3>Data Proyek</h3>
+
+            <div class="smallmuted">
+              Daftar seluruh proyek operasional
+            </div>
+          </div>
+
+        </div>
+
+
+        <div style="
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:12px;
+          margin-bottom:16px;
+        ">
+
+          <div>
+            <label>Filter Wilayah</label>
+
+            <select id="filterOperasiWilayah">
+              <option value="">Semua Wilayah</option>
+            </select>
+          </div>
+
+
+          <div>
+            <label>Cari Proyek</label>
+
+            <input
+              type="text"
+              id="filterOperasiProyek"
+              placeholder="Cari kode atau nama proyek..."
+            >
+          </div>
+
+        </div>
+
+
+        <!-- TABEL PROYEK -->
+
+        <div style="
+          overflow-x:auto;
+          width:100%;
+        ">
+
+          <table
+            id="tableOperasi"
+            style="
+              width:100%;
+              border-collapse:collapse;
+            "
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>No</th>
+                <th>Kode Proyek</th>
+                <th>Nama Proyek</th>
+                <th>Wilayah</th>
+                <th>Nilai Kontrak</th>
+                <th>Pendapatan</th>
+                <th>Pencairan</th>
+                <th>Biaya</th>
+                <th>Cashflow</th>
+                <th>Profit & Loss</th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="tableOperasiBody">
+
+              <tr>
+
+                <td
+                  colspan="10"
+                  style="text-align:center;padding:20px;"
+                >
+                  Memuat data proyek...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+       </div>
+      
   </section>
   <section id="page-paket" class="page">
     <div class="panel"><div class="sectionhead"><div><h3>Kelola Data Paket</h3><div class="smallmuted">Klik Edit untuk membuka form seperti tampilan lama.</div></div><button class="btn primary" id="goAdd2">＋ Tambah Paket</button></div>
@@ -599,34 +701,392 @@ function showPage(page){
   if(page==='log')renderLogs();
 }
 function renderOperasi(){
-  const url = 'https://script.google.com/macros/s/AKfycbwyo-ll_gVNx_Tz2Sedt9_mjscXAk0tvunoyv-9TN94b-GEZqMIAv5zbGs6FAVhmgWUjw/exec';
+
+  const url =
+    'https://script.google.com/macros/s/AKfycbwyo-ll_gVNx_Tz2Sedt9_mjscXAk0tvunoyv-9TN94b-GEZqMIAv5zbGs6FAVhmgWUjw/exec';
+
+  const page =
+    document.getElementById('page-operasi');
+
+  if(!page) return;
+
 
   fetch(url)
-    .then(response => response.json())
+
+    .then(response => {
+
+      if(!response.ok){
+        throw new Error(
+          'API Dashboard Operasi gagal diakses.'
+        );
+      }
+
+      return response.json();
+
+    })
+
     .then(result => {
 
       if(!result.success){
-        throw new Error('Data operasi gagal dimuat');
+        throw new Error(
+          result.message ||
+          'Data operasi gagal dimuat.'
+        );
       }
 
-      const d = result.data;
 
-      const page = document.getElementById('page-operasi');
-      if(!page) return;
+      // =====================================
+      // KPI
+      // =====================================
 
-      const values = page.querySelectorAll('.card .value');
+      const d =
+        result.data || {};
+
+      const values =
+        page.querySelectorAll('.card .value');
 
       if(values.length >= 4){
-        values[0].textContent = Number(d['Total Paket Proyek'] || 0).toLocaleString('id-ID');
-        values[1].textContent = 'Rp ' + Number(d['Nilai Kontrak Total'] || 0).toLocaleString('id-ID');
-        values[2].textContent = 'Rp ' + Number(d['Total Pendapatan'] || 0).toLocaleString('id-ID');
-        values[3].textContent = 'Rp ' + Number(d['Cashflow'] || 0).toLocaleString('id-ID');
+
+        values[0].textContent =
+          Number(
+            d['Total Paket Proyek'] || 0
+          ).toLocaleString('id-ID');
+
+        values[1].textContent =
+          'Rp ' +
+          Number(
+            d['Nilai Kontrak Total'] || 0
+          ).toLocaleString('id-ID');
+
+        values[2].textContent =
+          'Rp ' +
+          Number(
+            d['Total Pendapatan'] || 0
+          ).toLocaleString('id-ID');
+
+        values[3].textContent =
+          'Rp ' +
+          Number(
+            d['Cashflow'] || 0
+          ).toLocaleString('id-ID');
+
       }
 
+
+      // =====================================
+      // DATA PROYEK
+      // =====================================
+
+      const projects =
+        Array.isArray(result.projects)
+          ? result.projects
+          : [];
+
+
+      const tableBody =
+        document.getElementById(
+          'tableOperasiBody'
+        );
+
+      const filterWilayah =
+        document.getElementById(
+          'filterOperasiWilayah'
+        );
+
+      const filterProyek =
+        document.getElementById(
+          'filterOperasiProyek'
+        );
+
+
+      if(!tableBody) return;
+
+
+      // =====================================
+      // FILTER WILAYAH
+      // =====================================
+
+      if(filterWilayah){
+
+        const wilayahList = [
+          ...new Set(
+            projects
+              .map(p => p.wilayah)
+              .filter(Boolean)
+          )
+        ].sort();
+
+        filterWilayah.innerHTML =
+          '<option value="">Semua Wilayah</option>';
+
+        wilayahList.forEach(wilayah => {
+
+          const option =
+            document.createElement('option');
+
+          option.value = wilayah;
+          option.textContent = wilayah;
+
+          filterWilayah.appendChild(option);
+
+        });
+
+      }
+
+
+      // =====================================
+      // FORMAT RUPIAH
+      // =====================================
+
+      function rupiah(value){
+
+        return 'Rp ' +
+          Number(value || 0)
+            .toLocaleString('id-ID');
+
+      }
+
+
+      // =====================================
+      // ESCAPE HTML
+      // =====================================
+
+      function escOperasi(value){
+
+        return String(value ?? '')
+          .replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;')
+          .replace(/'/g,'&#039;');
+
+      }
+
+
+      // =====================================
+      // RENDER TABEL
+      // =====================================
+
+      function renderTable(){
+
+        const selectedWilayah =
+          filterWilayah
+            ? filterWilayah.value
+            : '';
+
+        const keyword =
+          filterProyek
+            ? filterProyek.value
+                .toLowerCase()
+                .trim()
+            : '';
+
+
+        const filteredProjects =
+          projects.filter(project => {
+
+            const kode =
+              String(
+                project.kodeProyek || ''
+              ).toLowerCase();
+
+            const nama =
+              String(
+                project.namaProyek || ''
+              ).toLowerCase();
+
+            const wilayah =
+              String(
+                project.wilayah || ''
+              );
+
+
+            const cocokWilayah =
+              !selectedWilayah ||
+              wilayah === selectedWilayah;
+
+            const cocokKeyword =
+              !keyword ||
+              kode.includes(keyword) ||
+              nama.includes(keyword);
+
+
+            return (
+              cocokWilayah &&
+              cocokKeyword
+            );
+
+          });
+
+
+        // =================================
+        // TIDAK ADA DATA
+        // =================================
+
+        if(!filteredProjects.length){
+
+          tableBody.innerHTML = `
+            <tr>
+              <td
+                colspan="10"
+                style="
+                  text-align:center;
+                  padding:20px;
+                "
+              >
+                Tidak ada proyek yang sesuai.
+              </td>
+            </tr>
+          `;
+
+          return;
+
+        }
+
+
+        // =================================
+        // ISI TABEL
+        // =================================
+
+        tableBody.innerHTML =
+          filteredProjects
+            .map((project,index) => `
+
+              <tr>
+
+                <td>
+                  ${index + 1}
+                </td>
+
+                <td>
+                  ${escOperasi(
+                    project.kodeProyek
+                  )}
+                </td>
+
+                <td>
+                  ${escOperasi(
+                    project.namaProyek
+                  )}
+                </td>
+
+                <td>
+                  ${escOperasi(
+                    project.wilayah
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.nilaiKontrak
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.totalPendapatan
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.realisasiPencairan
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.realisasiBiaya
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.cashflow
+                  )}
+                </td>
+
+                <td>
+                  ${rupiah(
+                    project.profitAndLoss
+                  )}
+                </td>
+
+              </tr>
+
+            `)
+            .join('');
+
+      }
+
+
+      // =====================================
+      // FILTER EVENT
+      // =====================================
+
+      if(filterWilayah){
+
+        filterWilayah.onchange =
+          renderTable;
+
+      }
+
+      if(filterProyek){
+
+        filterProyek.oninput =
+          renderTable;
+
+      }
+
+
+      // =====================================
+      // RENDER PERTAMA
+      // =====================================
+
+      renderTable();
+
+
+      console.log(
+        'Berhasil mengambil ' +
+        projects.length +
+        ' proyek operasi.'
+      );
+
     })
+
     .catch(error => {
-      console.error('Gagal mengambil data operasi:', error);
+
+      console.error(
+        'Gagal mengambil data operasi:',
+        error
+      );
+
+
+      const tableBody =
+        document.getElementById(
+          'tableOperasiBody'
+        );
+
+      if(tableBody){
+
+        tableBody.innerHTML = `
+          <tr>
+            <td
+              colspan="10"
+              style="
+                text-align:center;
+                padding:20px;
+              "
+            >
+              Gagal memuat data proyek.
+            </td>
+          </tr>
+        `;
+
+      }
+
     });
+
 }
 document.querySelectorAll('nav a[data-page]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showPage(a.dataset.page)}));
 
