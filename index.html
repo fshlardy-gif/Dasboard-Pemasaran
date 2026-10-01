@@ -296,33 +296,74 @@ body.logged-out .app{display:none}
         </div>
 
 
-        <div style="
-          display:grid;
-          grid-template-columns:1fr 1fr;
-          gap:12px;
-          margin-bottom:16px;
-        ">
+       <div style="
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:12px;
+  margin-bottom:16px;
+">
 
-          <div>
-            <label>Filter Wilayah</label>
+  <div>
+    <label>Filter Tahun</label>
 
-            <select id="filterOperasiWilayah">
-              <option value="">Semua Wilayah</option>
-            </select>
-          </div>
+    <select id="filterOperasiTahun">
+      <option value="">Semua Tahun</option>
+      <option value="2025">2025</option>
+      <option value="2026">2026</option>
+    </select>
+  </div>
 
 
-          <div>
-            <label>Cari Proyek</label>
+  <div>
+    <label>Filter Wilayah</label>
 
-            <input
-              type="text"
-              id="filterOperasiProyek"
-              placeholder="Cari kode atau nama proyek..."
-            >
-          </div>
+    <select id="filterOperasiWilayah">
+      <option value="">Semua Wilayah</option>
+    </select>
+  </div>
 
-        </div>
+
+  <div>
+    <label>Filter Proyek</label>
+
+    <select id="filterOperasiProyekSelect">
+      <option value="">Semua Proyek</option>
+    </select>
+  </div>
+
+
+  <div>
+    <label>Urutkan</label>
+
+    <select id="filterOperasiUrutan">
+      <option value="kode">Kode Proyek</option>
+      <option value="nilaiKontrak">Nilai Kontrak</option>
+      <option value="pendapatan">Pendapatan</option>
+      <option value="pencairan">Pencairan</option>
+      <option value="biaya">Biaya</option>
+      <option value="cashflow">Cashflow</option>
+      <option value="profitAndLoss">Profit & Loss</option>
+    </select>
+  </div>
+
+
+</div>
+
+
+<div style="
+  margin-bottom:16px;
+">
+
+  <label>Cari Proyek</label>
+
+  <input
+    type="text"
+    id="filterOperasiProyek"
+    placeholder="Cari kode atau nama proyek..."
+    style="width:100%;"
+  >
+
+</div>
 
 
         <!-- TABEL PROYEK -->
@@ -788,51 +829,104 @@ function renderOperasi(){
           'tableOperasiBody'
         );
 
-      const filterWilayah =
-        document.getElementById(
-          'filterOperasiWilayah'
-        );
+     const filterWilayah =
+  document.getElementById(
+    'filterOperasiWilayah'
+  );
 
-      const filterProyek =
-        document.getElementById(
-          'filterOperasiProyek'
-        );
+const filterProyekSelect =
+  document.getElementById(
+    'filterOperasiProyekSelect'
+  );
+
+const filterProyek =
+  document.getElementById(
+    'filterOperasiProyek'
+  );
+
+const filterUrutan =
+  document.getElementById(
+    'filterOperasiUrutan'
+  );
+
+const filterTahun =
+  document.getElementById(
+    'filterOperasiTahun'
+  );
 
 
-      if(!tableBody) return;
+if(!tableBody) return;
 
 
-      // =====================================
-      // FILTER WILAYAH
-      // =====================================
+// =====================================
+// FILTER WILAYAH
+// =====================================
 
-      if(filterWilayah){
+if(filterWilayah){
 
-        const wilayahList = [
-          ...new Set(
-            projects
-              .map(p => p.wilayah)
-              .filter(Boolean)
+  const wilayahList = [
+    ...new Set(
+      projects
+        .map(p => p.wilayah)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  filterWilayah.innerHTML =
+    '<option value="">Semua Wilayah</option>';
+
+  wilayahList.forEach(wilayah => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = wilayah;
+    option.textContent = wilayah;
+
+    filterWilayah.appendChild(option);
+
+  });
+
+}
+
+
+// =====================================
+// FILTER PROYEK
+// =====================================
+
+if(filterProyekSelect){
+
+  const projectList =
+    [...projects]
+      .sort((a,b) =>
+        String(a.namaProyek || '')
+          .localeCompare(
+            String(b.namaProyek || ''),
+            'id'
           )
-        ].sort();
+      );
 
-        filterWilayah.innerHTML =
-          '<option value="">Semua Wilayah</option>';
+  filterProyekSelect.innerHTML =
+    '<option value="">Semua Proyek</option>';
 
-        wilayahList.forEach(wilayah => {
+  projectList.forEach(project => {
 
-          const option =
-            document.createElement('option');
+    const option =
+      document.createElement('option');
 
-          option.value = wilayah;
-          option.textContent = wilayah;
+    option.value =
+      project.kodeProyek || '';
 
-          filterWilayah.appendChild(option);
+    option.textContent =
+      (project.kodeProyek || '') +
+      ' - ' +
+      (project.namaProyek || '');
 
-        });
+    filterProyekSelect.appendChild(option);
 
-      }
+  });
 
+}
 
       // =====================================
       // FORMAT RUPIAH
@@ -870,55 +964,134 @@ function renderOperasi(){
       function renderTable(){
 
         const selectedWilayah =
-          filterWilayah
-            ? filterWilayah.value
-            : '';
+  filterWilayah
+    ? filterWilayah.value
+    : '';
 
-        const keyword =
-          filterProyek
-            ? filterProyek.value
-                .toLowerCase()
-                .trim()
-            : '';
+const selectedProyek =
+  filterProyekSelect
+    ? filterProyekSelect.value
+    : '';
 
-
-        const filteredProjects =
-          projects.filter(project => {
-
-            const kode =
-              String(
-                project.kodeProyek || ''
-              ).toLowerCase();
-
-            const nama =
-              String(
-                project.namaProyek || ''
-              ).toLowerCase();
-
-            const wilayah =
-              String(
-                project.wilayah || ''
-              );
+const keyword =
+  filterProyek
+    ? filterProyek.value
+        .toLowerCase()
+        .trim()
+    : '';
 
 
-            const cocokWilayah =
-              !selectedWilayah ||
-              wilayah === selectedWilayah;
+let filteredProjects =
+  projects.filter(project => {
 
-            const cocokKeyword =
-              !keyword ||
-              kode.includes(keyword) ||
-              nama.includes(keyword);
+    const kode =
+      String(
+        project.kodeProyek || ''
+      ).toLowerCase();
+
+    const nama =
+      String(
+        project.namaProyek || ''
+      ).toLowerCase();
+
+    const wilayah =
+      String(
+        project.wilayah || ''
+      );
 
 
-            return (
-              cocokWilayah &&
-              cocokKeyword
-            );
-
-          });
+    const cocokWilayah =
+      !selectedWilayah ||
+      wilayah === selectedWilayah;
 
 
+    const cocokProyek =
+      !selectedProyek ||
+      String(
+        project.kodeProyek || ''
+      ) === selectedProyek;
+
+
+    const cocokKeyword =
+      !keyword ||
+      kode.includes(keyword) ||
+      nama.includes(keyword);
+
+
+    return (
+      cocokWilayah &&
+      cocokProyek &&
+      cocokKeyword
+    );
+
+  });
+
+
+// =====================================
+// URUTKAN DATA
+// =====================================
+
+const urutan =
+  filterUrutan
+    ? filterUrutan.value
+    : 'kode';
+
+
+filteredProjects.sort((a,b) => {
+
+  if(urutan === 'kode'){
+
+    return String(
+      a.kodeProyek || ''
+    ).localeCompare(
+      String(
+        b.kodeProyek || ''
+      ),
+      'id'
+    );
+
+  }
+
+
+  const nilaiA =
+    Number(
+      urutan === 'nilaiKontrak'
+        ? a.nilaiKontrak
+        : urutan === 'pendapatan'
+        ? a.totalPendapatan
+        : urutan === 'pencairan'
+        ? a.realisasiPencairan
+        : urutan === 'biaya'
+        ? a.realisasiBiaya
+        : urutan === 'cashflow'
+        ? a.cashflow
+        : urutan === 'profitAndLoss'
+        ? a.profitAndLoss
+        : 0
+    ) || 0;
+
+
+  const nilaiB =
+    Number(
+      urutan === 'nilaiKontrak'
+        ? b.nilaiKontrak
+        : urutan === 'pendapatan'
+        ? b.totalPendapatan
+        : urutan === 'pencairan'
+        ? b.realisasiPencairan
+        : urutan === 'biaya'
+        ? b.realisasiBiaya
+        : urutan === 'cashflow'
+        ? b.cashflow
+        : urutan === 'profitAndLoss'
+        ? b.profitAndLoss
+        : 0
+    ) || 0;
+
+
+  return nilaiB - nilaiA;
+
+});
         // =================================
         // TIDAK ADA DATA
         // =================================
@@ -1037,7 +1210,19 @@ function renderOperasi(){
           renderTable;
 
       }
+if(filterProyekSelect){
 
+  filterProyekSelect.onchange =
+    renderTable;
+
+}
+
+if(filterUrutan){
+
+  filterUrutan.onchange =
+    renderTable;
+
+}
 
       // =====================================
       // RENDER PERTAMA
