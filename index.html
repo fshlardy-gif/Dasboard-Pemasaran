@@ -1583,298 +1583,604 @@ function renderOperasi(){
       // GRAFIK FINANSIAL
       // =====================================
 
-      function renderFinancialChart(list){
+     function renderFinancialChart(list){
 
-        if(!financialChart)
-          return;
+  const chart =
+    document.getElementById(
+      'operasiChartFinancial'
+    );
 
-
-        if(!list.length){
-
-          financialChart.innerHTML =
-            '<div>Tidak ada data.</div>';
-
-          return;
-
-        }
+  if(!chart)
+    return;
 
 
-        const wilayahMap = {};
+  // =====================================
+  // AGREGASI PER WILAYAH
+  // =====================================
+
+  const wilayahMap = {};
 
 
-        list.forEach(project => {
+  list.forEach(project => {
 
-          const wilayah =
-            project.wilayah ||
-            'Tanpa Wilayah';
-
-
-          if(!wilayahMap[wilayah]){
-
-            wilayahMap[wilayah] = {
-
-              kontrak:0,
-              pendapatan:0,
-              pencairan:0,
-              biaya:0
-
-            };
-
-          }
+    const wilayah =
+      String(
+        project.wilayah ||
+        'Tidak diketahui'
+      ).trim();
 
 
-          wilayahMap[wilayah].kontrak +=
-            num(project.nilaiKontrak);
+    if(!wilayahMap[wilayah]){
 
-          wilayahMap[wilayah].pendapatan +=
-            num(project.totalPendapatan);
+      wilayahMap[wilayah] = {
 
-          wilayahMap[wilayah].pencairan +=
-            num(project.realisasiPencairan);
+        kontrak:0,
+        pendapatan:0,
+        pencairan:0,
+        biaya:0
 
-          wilayahMap[wilayah].biaya +=
-            num(project.realisasiBiaya);
+      };
 
-        });
-
-
-        const rows =
-          Object.entries(wilayahMap)
-            .sort(
-              (a,b) =>
-                b[1].kontrak -
-                a[1].kontrak
-            );
+    }
 
 
-        const max =
-          Math.max(
-            ...rows.map(
-              x => x[1].kontrak
-            ),
-            1
+    wilayahMap[wilayah].kontrak +=
+      num(project.nilaiKontrak);
+
+    wilayahMap[wilayah].pendapatan +=
+      num(project.totalPendapatan);
+
+    wilayahMap[wilayah].pencairan +=
+      num(project.realisasiPencairan);
+
+    wilayahMap[wilayah].biaya +=
+      num(project.realisasiBiaya);
+
+  });
+
+
+  const data =
+    Object.entries(wilayahMap)
+      .sort(
+        (a,b) =>
+          b[1].pendapatan -
+          a[1].pendapatan
+      );
+
+
+  if(!data.length){
+
+    chart.innerHTML = `
+
+      <div style="
+        padding:40px;
+        text-align:center;
+        color:#7a847d;
+      ">
+        Belum ada data finansial.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  // =====================================
+  // FORMAT RUPIAH PENUH
+  // =====================================
+
+  const formatRupiah =
+    value => {
+
+      return 'Rp ' +
+        Number(value || 0)
+          .toLocaleString(
+            'id-ID',
+            {
+              maximumFractionDigits:0
+            }
           );
 
-
-        financialChart.innerHTML = rows
-          .map(([wilayah,v]) => {
-
-            const width =
-              Math.max(
-                4,
-                (v.kontrak / max) * 100
-              );
+    };
 
 
-            return `
+  // =====================================
+  // PERSENTASE TERHADAP PENDAPATAN
+  // =====================================
 
-              <div style="
-                margin-bottom:18px;
-              ">
+  const persen =
+    (value,base) => {
 
-                <div style="
-                  display:flex;
-                  justify-content:space-between;
-                  gap:12px;
-                  margin-bottom:6px;
-                  font-size:13px;
-                  font-weight:600;
-                ">
+      if(!base)
+        return 0;
 
-                  <span>
-                    ${esc(wilayah)}
-                  </span>
+      return (
+        value /
+        base
+      ) * 100;
 
-                  <span>
-                    ${compact(v.kontrak)}
-                  </span>
-
-                </div>
+    };
 
 
-                <div style="
-                  height:12px;
-                  background:#e8eee8;
-                  border-radius:10px;
-                  overflow:hidden;
-                ">
+  // =====================================
+  // NILAI MAKSIMUM BAR
+  // =====================================
 
-                  <div style="
-                    width:${width}%;
-                    height:100%;
-                    background:#176b3a;
-                    border-radius:10px;
-                  "></div>
+  const maxValue =
+    Math.max(
+      1,
+      ...data.flatMap(
+        ([wilayah,x]) => [
 
-                </div>
+          x.kontrak,
+          x.pendapatan,
+          x.pencairan,
+          x.biaya
 
-
-                <div style="
-                  display:grid;
-                  grid-template-columns:repeat(3,1fr);
-                  gap:8px;
-                  margin-top:7px;
-                  font-size:11px;
-                  color:#68736c;
-                ">
-
-                  <span>
-                    Pendapatan:
-                    ${compact(v.pendapatan)}
-                  </span>
-
-                  <span>
-                    Pencairan:
-                    ${compact(v.pencairan)}
-                  </span>
-
-                  <span>
-                    Biaya:
-                    ${compact(v.biaya)}
-                  </span>
-
-                </div>
-
-              </div>
-
-            `;
-
-          })
-          .join('');
-
-      }
+        ]
+      )
+    );
 
 
-      // =====================================
-      // GRAFIK PROGRESS
-      // =====================================
+  // =====================================
+  // OUTER CONTAINER
+  // =====================================
 
-      function renderProgressChart(list){
+  let html = `
 
-        if(!progressChart)
-          return;
-
-
-        if(!list.length){
-
-          progressChart.innerHTML =
-            '<div>Tidak ada data.</div>';
-
-          return;
-
-        }
+    <div style="
+      width:100%;
+      overflow:hidden;
+      background:#f7faf7;
+      border-radius:12px;
+      padding:14px;
+      box-sizing:border-box;
+    ">
 
 
-        const statusMap = {};
+      <!-- ================================= -->
+      <!-- LEGEND -->
+      <!-- ================================= -->
+
+      <div style="
+        display:flex;
+        gap:18px;
+        flex-wrap:wrap;
+
+        margin-bottom:16px;
+        padding:12px 14px;
+
+        background:#eef5ee;
+
+        border:1px solid #dfe8df;
+        border-radius:10px;
+
+        font-size:11px;
+        color:#59675f;
+      ">
 
 
-        list.forEach(project => {
+        <!-- KONTRAK -->
 
-          let status =
-            project.status ||
-            project.progres ||
-            project.progress ||
-            project.statusProyek ||
-            project.tahap ||
-            project.keterangan ||
-            'Data Tersedia';
+        <span>
+          <i style="
+            display:inline-block;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#164c2f;
+            margin-right:5px;
+          "></i>
 
-
-          status =
-            String(status)
-              .trim() ||
-              'Data Tersedia';
+          Nilai Kontrak
+        </span>
 
 
-          statusMap[status] =
-            (
-              statusMap[status] || 0
-            ) + 1;
+        <!-- PENDAPATAN -->
 
-        });
+        <span>
+          <i style="
+            display:inline-block;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#5d946b;
+            margin-right:5px;
+          "></i>
 
-
-        const entries =
-          Object.entries(statusMap)
-            .sort(
-              (a,b) =>
-                b[1] - a[1]
-            );
-
-
-        const total =
-          list.length;
+          Pendapatan
+        </span>
 
 
-        progressChart.innerHTML = `
+        <!-- PENCAIRAN -->
+
+        <span>
+          <i style="
+            display:inline-block;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#c28a43;
+            margin-right:5px;
+          "></i>
+
+          Pencairan
+        </span>
+
+
+        <!-- BIAYA -->
+
+        <span>
+          <i style="
+            display:inline-block;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#a94b3d;
+            margin-right:5px;
+          "></i>
+
+          Biaya
+        </span>
+
+      </div>
+
+
+      <!-- ================================= -->
+      <!-- HEADER -->
+      <!-- ================================= -->
+
+      <div style="
+        display:grid;
+
+        grid-template-columns:
+          minmax(180px,1.35fr)
+          repeat(4,minmax(135px,1fr));
+
+        gap:12px;
+
+        padding:
+          0 12px 9px;
+
+        font-size:10px;
+        font-weight:700;
+
+        color:#7a847d;
+
+        text-transform:uppercase;
+        letter-spacing:.3px;
+      ">
+
+        <div>
+          Wilayah Operasi
+        </div>
+
+        <div style="
+          text-align:right;
+        ">
+          Nilai Kontrak
+        </div>
+
+        <div style="
+          text-align:right;
+        ">
+          Pendapatan
+        </div>
+
+        <div style="
+          text-align:right;
+        ">
+          Pencairan
+        </div>
+
+        <div style="
+          text-align:right;
+        ">
+          Biaya
+        </div>
+
+      </div>
+
+
+      <!-- ================================= -->
+      <!-- DATA ROWS -->
+      <!-- ================================= -->
+
+      <div style="
+        display:flex;
+        flex-direction:column;
+        gap:7px;
+      ">
+
+  `;
+
+
+  data.forEach(
+    ([wilayah,x]) => {
+
+
+      // =================================
+      // PERSENTASE
+      // =================================
+
+      const pctPencairan =
+        persen(
+          x.pencairan,
+          x.pendapatan
+        );
+
+
+      const pctBiaya =
+        persen(
+          x.biaya,
+          x.pendapatan
+        );
+
+
+      // =================================
+      // ROW
+      // =================================
+
+      html += `
+
+        <div
+          style="
+            display:grid;
+
+            grid-template-columns:
+              minmax(180px,1.35fr)
+              repeat(4,minmax(135px,1fr));
+
+            gap:12px;
+
+            align-items:center;
+
+            padding:13px 12px;
+
+            background:#ffffff;
+
+            border:1px solid #dfe8df;
+
+            border-radius:10px;
+
+            box-sizing:border-box;
+          "
+        >
+
+
+          <!-- =========================== -->
+          <!-- WILAYAH -->
+          <!-- =========================== -->
 
           <div style="
-            width:100%;
+            min-width:0;
           ">
 
-            ${entries.map(
-              ([status,count]) => {
+            <div style="
+              font-size:12px;
+              font-weight:700;
 
-                const pct =
-                  (
-                    count / total
-                  ) * 100;
+              color:#164c2f;
 
+              line-height:1.35;
 
-                return `
-
-                  <div style="
-                    margin-bottom:13px;
-                  ">
-
-                    <div style="
-                      display:flex;
-                      justify-content:space-between;
-                      font-size:13px;
-                      margin-bottom:5px;
-                    ">
-
-                      <span>
-                        ${esc(status)}
-                      </span>
-
-                      <b>
-                        ${count}
-                        proyek
-                        (${pct.toFixed(1)}%)
-                      </b>
-
-                    </div>
-
-                    <div style="
-                      height:9px;
-                      background:#e8eee8;
-                      border-radius:8px;
-                      overflow:hidden;
-                    ">
-
-                      <div style="
-                        width:${pct}%;
-                        height:100%;
-                        background:#4d8b62;
-                      "></div>
-
-                    </div>
-
-                  </div>
-
-                `;
-
-              }
-            ).join('')}
+              word-break:break-word;
+            ">
+              ${esc(wilayah)}
+            </div>
 
           </div>
 
-        `;
 
-      }
+          <!-- =========================== -->
+          <!-- NILAI KONTRAK -->
+          <!-- =========================== -->
+
+          <div style="
+            text-align:right;
+            min-width:0;
+          ">
+
+            <div style="
+              font-size:12px;
+              font-weight:700;
+              color:#164c2f;
+
+              white-space:nowrap;
+            ">
+              ${formatRupiah(
+                x.kontrak
+              )}
+            </div>
 
 
+            <div style="
+              height:5px;
+
+              margin-top:6px;
+
+              background:#e7eee9;
+
+              border-radius:10px;
+
+              overflow:hidden;
+            ">
+
+              <div style="
+                width:${Math.min(
+                  x.kontrak /
+                  maxValue * 100,
+                  100
+                )}%;
+
+                height:100%;
+
+                background:#164c2f;
+
+                border-radius:10px;
+              "></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- =========================== -->
+          <!-- PENDAPATAN -->
+          <!-- =========================== -->
+
+          <div style="
+            text-align:right;
+            min-width:0;
+          ">
+
+            <div style="
+              font-size:12px;
+              font-weight:700;
+              color:#5d946b;
+
+              white-space:nowrap;
+            ">
+              ${formatRupiah(
+                x.pendapatan
+              )}
+            </div>
+
+
+            <div style="
+              height:5px;
+
+              margin-top:6px;
+
+              background:#e7eee9;
+
+              border-radius:10px;
+
+              overflow:hidden;
+            ">
+
+              <div style="
+                width:${Math.min(
+                  x.pendapatan /
+                  maxValue * 100,
+                  100
+                )}%;
+
+                height:100%;
+
+                background:#5d946b;
+
+                border-radius:10px;
+              "></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- =========================== -->
+          <!-- PENCAIRAN -->
+          <!-- =========================== -->
+
+          <div style="
+            text-align:right;
+            min-width:0;
+          ">
+
+            <div style="
+              font-size:12px;
+              font-weight:700;
+
+              color:#c28a43;
+
+              white-space:nowrap;
+            ">
+              ${formatRupiah(
+                x.pencairan
+              )}
+            </div>
+
+
+            <div style="
+              font-size:10px;
+
+              color:#7a847d;
+
+              margin-top:3px;
+            ">
+              ${pctPencairan.toFixed(2)}%
+
+              dari pendapatan
+            </div>
+
+          </div>
+
+
+          <!-- =========================== -->
+          <!-- BIAYA -->
+          <!-- =========================== -->
+
+          <div style="
+            text-align:right;
+            min-width:0;
+          ">
+
+            <div style="
+              font-size:12px;
+              font-weight:700;
+
+              color:#a94b3d;
+
+              white-space:nowrap;
+            ">
+              ${formatRupiah(
+                x.biaya
+              )}
+            </div>
+
+
+            <div style="
+              font-size:10px;
+
+              color:#7a847d;
+
+              margin-top:3px;
+            ">
+              ${pctBiaya.toFixed(2)}%
+
+              dari pendapatan
+            </div>
+
+          </div>
+
+
+        </div>
+
+      `;
+
+    }
+  );
+
+
+  // =====================================
+  // TUTUP CONTAINER
+  // =====================================
+
+  html += `
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  chart.innerHTML =
+    html;
+
+}
       // =====================================
       // PROJECT CARDS
       // =====================================
