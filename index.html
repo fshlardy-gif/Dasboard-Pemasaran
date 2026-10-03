@@ -1130,10 +1130,12 @@ function renderOperasi(){
 
         return 'Rp ' +
           Number(value || 0)
-            .toLocaleString('id-ID');
-
-      }
-
+          .toLocaleString(
+  'id-ID',
+  {
+    maximumFractionDigits: 0
+  }
+)
 
       function esc(value){
 
