@@ -1881,300 +1881,551 @@ function renderOperasi(){
 
       function renderProjectCards(list){
 
-        if(!projectCards)
-          return;
+  if(!projectCards)
+    return;
 
 
-        if(!list.length){
+  if(!list.length){
 
-          projectCards.innerHTML = `
+    projectCards.innerHTML = `
 
-            <div style="
-              grid-column:1/-1;
-              text-align:center;
-              padding:35px;
-              color:#7a847d;
-            ">
+      <div style="
+        grid-column:1/-1;
+        text-align:center;
+        padding:35px;
+        color:#7a847d;
+      ">
 
-              Tidak ada proyek yang sesuai
-              dengan filter.
+        Tidak ada proyek yang sesuai
+        dengan filter.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  projectCards.innerHTML =
+    list.map((project,index) => {
+
+      const cashflow =
+        num(project.cashflow);
+
+      const pendapatan =
+        num(project.totalPendapatan);
+
+      const pencairan =
+        num(project.realisasiPencairan);
+
+      const biaya =
+        num(project.realisasiBiaya);
+
+
+      // =====================================
+      // ACUAN = TOTAL PENDAPATAN
+      // TOTAL PENDAPATAN = 100%
+      // =====================================
+
+      const persen =
+        value => {
+
+          if(pendapatan <= 0)
+            return 0;
+
+          return (
+            value /
+            pendapatan
+          ) * 100;
+
+        };
+
+
+      const persenPencairan =
+        persen(pencairan);
+
+      const persenBiaya =
+        persen(biaya);
+
+      const persenCashflow =
+        persen(cashflow);
+
+
+      const status =
+        project.status ||
+        project.progres ||
+        project.progress ||
+        project.statusProyek ||
+        project.tahap ||
+        'Data Tersedia';
+
+
+      return `
+
+        <div
+          class="card"
+          data-operasi-project="${esc(
+            project.kodeProyek || ''
+          )}"
+          style="
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid #e5ebe5;
+          "
+          title="Klik untuk melihat detail proyek"
+        >
+
+
+          <!-- HEADER -->
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            align-items:flex-start;
+          ">
+
+            <div>
+
+              <div style="
+                font-size:12px;
+                color:#6c776f;
+                margin-bottom:4px;
+              ">
+                ${esc(
+                  project.kodeProyek || '-'
+                )}
+              </div>
+
+              <div style="
+                font-size:16px;
+                font-weight:700;
+                color:#164c2f;
+                line-height:1.35;
+              ">
+                ${esc(
+                  project.namaProyek || '-'
+                )}
+              </div>
 
             </div>
 
-          `;
 
-          return;
+            <span style="
+              font-size:11px;
+              background:#eef5ee;
+              color:#176b3a;
+              padding:5px 8px;
+              border-radius:12px;
+              white-space:nowrap;
+            ">
+              ${esc(status)}
+            </span>
 
-        }
-
-
-        projectCards.innerHTML =
-          list.map((project,index) => {
-
-            const cashflow =
-              num(project.cashflow);
-
-
-            const status =
-              project.status ||
-              project.progres ||
-              project.progress ||
-              project.statusProyek ||
-              project.tahap ||
-              'Data Tersedia';
+          </div>
 
 
-            return `
-
-              <div
-                class="card"
-                data-operasi-project="${esc(
-                  project.kodeProyek || ''
-                )}"
-                style="
-                  cursor:pointer;
-                  transition:.2s;
-                  border:1px solid #e5ebe5;
-                "
-                title="Klik untuk melihat detail proyek"
-              >
-
-                <div style="
-                  display:flex;
-                  justify-content:space-between;
-                  gap:10px;
-                  align-items:flex-start;
-                ">
-
-                  <div>
-
-                    <div style="
-                      font-size:12px;
-                      color:#6c776f;
-                      margin-bottom:4px;
-                    ">
-                      ${esc(
-                        project.kodeProyek || '-'
-                      )}
-                    </div>
-
-                    <div style="
-                      font-size:16px;
-                      font-weight:700;
-                      color:#164c2f;
-                      line-height:1.35;
-                    ">
-                      ${esc(
-                        project.namaProyek || '-'
-                      )}
-                    </div>
-
-                  </div>
-
-                  <span style="
-                    font-size:11px;
-                    background:#eef5ee;
-                    color:#176b3a;
-                    padding:5px 8px;
-                    border-radius:12px;
-                    white-space:nowrap;
-                  ">
-                    ${esc(status)}
-                  </span>
-
-                </div>
+          <!-- INFORMASI UTAMA -->
+          <div style="
+            margin-top:15px;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+          ">
 
 
-                <div style="
-                  margin-top:15px;
-                  display:grid;
-                  grid-template-columns:1fr 1fr;
-                  gap:10px;
-                ">
+            <!-- WILAYAH -->
+            <div>
 
-                  <div>
-                    <div class="smallmuted">
-                      Wilayah
-                    </div>
-
-                    <b>
-                      ${esc(
-                        project.wilayah || '-'
-                      )}
-                    </b>
-                  </div>
-
-
-                  <div>
-                    <div class="smallmuted">
-                      Nilai Kontrak
-                    </div>
-
-                    <b>
-                      ${compact(
-                        project.nilaiKontrak
-                      )}
-                    </b>
-                  </div>
-
-
-                  <div>
-                    <div class="smallmuted">
-                      Pendapatan
-                    </div>
-
-                    <b>
-                      ${compact(
-                        project.totalPendapatan
-                      )}
-                    </b>
-                  </div>
-
-
-                  <div>
-                    <div class="smallmuted">
-                      Pencairan
-                    </div>
-
-                    <b>
-                      ${compact(
-                        project.realisasiPencairan
-                      )}
-                    </b>
-                  </div>
-
-
-                  <div>
-                    <div class="smallmuted">
-                      Realisasi Biaya
-                    </div>
-
-                    <b>
-                      ${compact(
-                        project.realisasiBiaya
-                      )}
-                    </b>
-                  </div>
-
-
-                  <div>
-                    <div class="smallmuted">
-                      Cashflow
-                    </div>
-
-                    <b style="
-                      color:${cashflow >= 0
-                        ? '#176b3a'
-                        : '#b42318'};
-                    ">
-                      ${compact(cashflow)}
-                    </b>
-                  </div>
-
-                </div>
-
-
-                <div style="
-                  margin-top:15px;
-                  padding-top:12px;
-                  border-top:1px solid #edf1ed;
-                  font-size:12px;
-                  color:#176b3a;
-                  font-weight:600;
-                ">
-                  Klik untuk detail proyek →
-                </div>
-
+              <div class="smallmuted">
+                Wilayah
               </div>
 
-            `;
+              <b>
+                ${esc(
+                  project.wilayah || '-'
+                )}
+              </b>
 
-          })
-          .join('');
-
-
-        projectCards
-          .querySelectorAll(
-            '[data-operasi-project]'
-          )
-          .forEach(card => {
-
-            card.addEventListener(
-              'click',
-              () => {
-
-                const kode =
-                  card.dataset
-                    .operasiProject;
+            </div>
 
 
-                const project =
-                  projects.find(
-                    p =>
-                      String(
-                        p.kodeProyek || ''
-                      ) === String(kode)
-                  );
+            <!-- NILAI KONTRAK -->
+            <div>
+
+              <div class="smallmuted">
+                Nilai Kontrak
+              </div>
+
+              <b>
+                ${compact(
+                  project.nilaiKontrak
+                )}
+              </b>
+
+            </div>
 
 
-                if(!project)
-                  return;
+            <!-- TOTAL PENDAPATAN -->
+            <div>
+
+              <div class="smallmuted">
+                Total Pendapatan
+              </div>
+
+              <b style="
+                color:#164c2f;
+              ">
+                ${compact(
+                  pendapatan
+                )}
+              </b>
+
+              <span style="
+                font-size:11px;
+                color:#176b3a;
+                font-weight:600;
+                margin-left:4px;
+              ">
+                100%
+              </span>
+
+            </div>
 
 
-                alert(
+            <!-- PENCAIRAN -->
+            <div>
 
-                  'DETAIL PROYEK\n\n' +
+              <div class="smallmuted">
+                Pencairan
+              </div>
 
-                  'Kode: ' +
-                  (
-                    project.kodeProyek || '-'
-                  ) +
+              <b>
+                ${compact(
+                  pencairan
+                )}
+              </b>
 
-                  '\nNama: ' +
-                  (
-                    project.namaProyek || '-'
-                  ) +
+              <span style="
+                font-size:11px;
+                color:#176b3a;
+                font-weight:600;
+                margin-left:4px;
+              ">
+                ${persenPencairan.toFixed(2)}%
+              </span>
 
-                  '\nWilayah: ' +
-                  (
-                    project.wilayah || '-'
-                  ) +
+            </div>
 
-                  '\n\nNilai Kontrak: ' +
-                  rupiah(
-                    project.nilaiKontrak
-                  ) +
 
-                  '\nPendapatan: ' +
-                  rupiah(
-                    project.totalPendapatan
-                  ) +
+            <!-- BIAYA -->
+            <div>
 
-                  '\nPencairan: ' +
-                  rupiah(
-                    project.realisasiPencairan
-                  ) +
+              <div class="smallmuted">
+                Realisasi Biaya
+              </div>
 
-                  '\nBiaya: ' +
-                  rupiah(
-                    project.realisasiBiaya
-                  ) +
+              <b>
+                ${compact(
+                  biaya
+                )}
+              </b>
 
-                  '\nCashflow: ' +
-                  rupiah(
-                    project.cashflow
-                  )
+              <span style="
+                font-size:11px;
+                color:#a66a22;
+                font-weight:600;
+                margin-left:4px;
+              ">
+                ${persenBiaya.toFixed(2)}%
+              </span>
 
-                );
+            </div>
 
-              }
+
+            <!-- CASHFLOW -->
+            <div>
+
+              <div class="smallmuted">
+                Cashflow
+              </div>
+
+              <b style="
+                color:${cashflow >= 0
+                  ? '#176b3a'
+                  : '#b42318'};
+              ">
+                ${compact(cashflow)}
+              </b>
+
+              <span style="
+                font-size:11px;
+                color:${cashflow >= 0
+                  ? '#176b3a'
+                  : '#b42318'};
+                font-weight:600;
+                margin-left:4px;
+              ">
+                ${persenCashflow.toFixed(2)}%
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- PROGRESS PENCAIRAN -->
+          <div style="
+            margin-top:16px;
+          ">
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              font-size:11px;
+              color:#6c776f;
+              margin-bottom:5px;
+            ">
+
+              <span>
+                Pencairan terhadap Pendapatan
+              </span>
+
+              <strong style="
+                color:#176b3a;
+              ">
+                ${persenPencairan.toFixed(2)}%
+              </strong>
+
+            </div>
+
+
+            <div style="
+              height:6px;
+              background:#e9eee9;
+              border-radius:10px;
+              overflow:hidden;
+            ">
+
+              <div style="
+                width:${Math.min(
+                  Math.max(
+                    persenPencairan,
+                    0
+                  ),
+                  100
+                )}%;
+                height:100%;
+                background:#176b3a;
+                border-radius:10px;
+              "></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- PROGRESS BIAYA -->
+          <div style="
+            margin-top:10px;
+          ">
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              font-size:11px;
+              color:#6c776f;
+              margin-bottom:5px;
+            ">
+
+              <span>
+                Biaya terhadap Pendapatan
+              </span>
+
+              <strong style="
+                color:#a66a22;
+              ">
+                ${persenBiaya.toFixed(2)}%
+              </strong>
+
+            </div>
+
+
+            <div style="
+              height:6px;
+              background:#f0eee9;
+              border-radius:10px;
+              overflow:hidden;
+            ">
+
+              <div style="
+                width:${Math.min(
+                  Math.max(
+                    persenBiaya,
+                    0
+                  ),
+                  100
+                )}%;
+                height:100%;
+                background:#c28a43;
+                border-radius:10px;
+              "></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- FOOTER -->
+          <div style="
+            margin-top:15px;
+            padding-top:12px;
+            border-top:1px solid #edf1ed;
+            font-size:12px;
+            color:#176b3a;
+            font-weight:600;
+          ">
+            Klik untuk detail proyek →
+          </div>
+
+
+        </div>
+
+      `;
+
+    })
+    .join('');
+
+
+  // =====================================
+  // EVENT DETAIL PROYEK
+  // =====================================
+
+  projectCards
+    .querySelectorAll(
+      '[data-operasi-project]'
+    )
+    .forEach(card => {
+
+      card.addEventListener(
+        'click',
+        () => {
+
+          const kode =
+            card.dataset
+              .operasiProject;
+
+
+          const project =
+            projects.find(
+              p =>
+                String(
+                  p.kodeProyek || ''
+                ) === String(kode)
             );
 
-          });
 
-      }
+          if(!project)
+            return;
 
 
+          const pendapatan =
+            num(
+              project.totalPendapatan
+            );
+
+          const pencairan =
+            num(
+              project.realisasiPencairan
+            );
+
+          const biaya =
+            num(
+              project.realisasiBiaya
+            );
+
+          const cashflow =
+            num(
+              project.cashflow
+            );
+
+
+          const persen =
+            value =>
+              pendapatan > 0
+                ? (
+                    value /
+                    pendapatan
+                  ) * 100
+                : 0;
+
+
+          alert(
+
+            'DETAIL PROYEK\n\n' +
+
+            'Kode: ' +
+            (
+              project.kodeProyek || '-'
+            ) +
+
+            '\nNama: ' +
+            (
+              project.namaProyek || '-'
+            ) +
+
+            '\nWilayah: ' +
+            (
+              project.wilayah || '-'
+            ) +
+
+            '\n\nNilai Kontrak: ' +
+            rupiah(
+              project.nilaiKontrak
+            ) +
+
+            '\nTotal Pendapatan: ' +
+            rupiah(
+              pendapatan
+            ) +
+            ' (100%)' +
+
+            '\nPencairan: ' +
+            rupiah(
+              pencairan
+            ) +
+            ' (' +
+            persen(pencairan)
+              .toFixed(2) +
+            '%)' +
+
+            '\nBiaya: ' +
+            rupiah(
+              biaya
+            ) +
+            ' (' +
+            persen(biaya)
+              .toFixed(2) +
+            '%)' +
+
+            '\nCashflow: ' +
+            rupiah(
+              cashflow
+            ) +
+            ' (' +
+            persen(cashflow)
+              .toFixed(2) +
+            '%)'
+
+          );
+
+        }
+      );
+
+    });
+
+}
       // =====================================
       // RENDER SEMUA
       // =====================================
