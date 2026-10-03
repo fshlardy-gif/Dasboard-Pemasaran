@@ -237,194 +237,482 @@ body.logged-out .app{display:none}
     </div>
   </section>
   <!-- DASHBOARD OPERASI -->
-  <section id="page-operasi" class="page">
+<section id="page-operasi" class="page">
 
-    <div class="panel">
+  <div class="panel">
+
+    <!-- HEADER -->
+    <div class="sectionhead">
+      <div>
+        <h2>Dashboard Operasi</h2>
+        <div class="smallmuted">
+          Monitoring Operasional Proyek
+        </div>
+      </div>
+    </div>
+
+    <div class="notice">
+      Data operasional tersinkronisasi dari database operasi.
+    </div>
+
+    <!-- GLOBAL FILTER -->
+    <div class="panel" style="
+      margin-top:20px;
+      background:#f8faf7;
+    ">
 
       <div class="sectionhead">
         <div>
-          <h2>Dashboard Operasi</h2>
+          <h3>Filter Operasional</h3>
           <div class="smallmuted">
-            Monitoring Operasional Proyek
+            Filter ini digunakan untuk seluruh data dashboard
           </div>
         </div>
       </div>
 
-            <div class="notice">
-        Data operasional tersinkronisasi dari database operasi.
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:12px;
+        margin-bottom:12px;
+      ">
+
+        <div>
+          <label>Tahun</label>
+          <select id="filterOperasiTahun">
+            <option value="">Semua Tahun</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Wilayah / Divisi</label>
+          <select id="filterOperasiWilayah">
+            <option value="">Semua Wilayah</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Proyek</label>
+          <select id="filterOperasiProyekSelect">
+            <option value="">Semua Proyek</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Urutkan</label>
+          <select id="filterOperasiUrutan">
+
+            <option value="kode">
+              Kode Proyek
+            </option>
+
+            <option value="nilaiKontrak">
+              Nilai Kontrak
+            </option>
+
+            <option value="pendapatan">
+              Pendapatan
+            </option>
+
+            <option value="pencairan">
+              Pencairan
+            </option>
+
+            <option value="biaya">
+              Biaya
+            </option>
+
+            <option value="cashflow">
+              Cashflow
+            </option>
+
+            <option value="profitAndLoss">
+              Profit & Loss
+            </option>
+
+          </select>
+        </div>
+
       </div>
 
-      <div class="cards">
+      <div>
+        <label>Cari Proyek</label>
 
-        <div class="card">
-          <div class="label">Total Proyek</div>
-          <div class="value">0</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Nilai Kontrak</div>
-          <div class="value">Rp 0</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Pendapatan</div>
-          <div class="value">Rp 0</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Cashflow</div>
-          <div class="value">Rp 0</div>
-        </div>
+        <input
+          type="text"
+          id="filterOperasiProyek"
+          placeholder="Cari kode atau nama proyek..."
+          style="width:100%;"
+        >
 
       </div>
 
+    </div>
 
-      <!-- FILTER OPERASI -->
 
-      <div class="panel" style="margin-top:20px;">
+    <!-- KPI CARDS -->
+
+    <div
+      class="cards"
+      style="
+        margin-top:20px;
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:14px;
+      "
+    >
+
+      <div class="card">
+        <div class="label">
+          Nilai Kontrak Total
+        </div>
+
+        <div
+          class="value"
+          id="operasiNilaiKontrak"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Total Pendapatan
+        </div>
+
+        <div
+          class="value"
+          id="operasiTotalPendapatan"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Pendapatan 2025
+        </div>
+
+        <div
+          class="value"
+          id="operasiPendapatan2025"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Pendapatan 2026
+        </div>
+
+        <div
+          class="value"
+          id="operasiPendapatan2026"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Pendapatan s/d Bulan Ini
+        </div>
+
+        <div
+          class="value"
+          id="operasiPendapatanBulanIni"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Pencairan Kas (Termin)
+        </div>
+
+        <div
+          class="value"
+          id="operasiPencairan"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Realisasi Biaya Proyek
+        </div>
+
+        <div
+          class="value"
+          id="operasiBiaya"
+        >
+          Rp 0
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="label">
+          Cashflow
+        </div>
+
+        <div
+          class="value"
+          id="operasiCashflow"
+        >
+          Rp 0
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- GRAFIK -->
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:1.5fr 1fr;
+        gap:16px;
+        margin-top:20px;
+      "
+    >
+
+      <div class="panel">
 
         <div class="sectionhead">
-
           <div>
-            <h3>Data Proyek</h3>
+
+            <h3>
+              Komparasi Finansial per Wilayah Operasi
+            </h3>
 
             <div class="smallmuted">
-              Daftar seluruh proyek operasional
+              Nilai kontrak, pendapatan, pencairan dan biaya
             </div>
-          </div>
 
+          </div>
         </div>
 
+        <div
+          id="operasiChartFinancial"
+          style="
+            min-height:320px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#7a847d;
+          "
+        >
+          Grafik finansial akan ditampilkan di sini
+        </div>
 
-       <div style="
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr 1fr;
-  gap:12px;
-  margin-bottom:16px;
-">
-
-  <div>
-    <label>Filter Tahun</label>
-
-    <select id="filterOperasiTahun">
-      <option value="">Semua Tahun</option>
-      <option value="2025">2025</option>
-      <option value="2026">2026</option>
-    </select>
-  </div>
+      </div>
 
 
-  <div>
-    <label>Filter Wilayah</label>
+      <div class="panel">
 
-    <select id="filterOperasiWilayah">
-      <option value="">Semua Wilayah</option>
-    </select>
-  </div>
+        <div class="sectionhead">
+          <div>
 
+            <h3>
+              Distribusi Status Progres Proyek
+            </h3>
 
-  <div>
-    <label>Filter Proyek</label>
+            <div class="smallmuted">
+              Status seluruh proyek operasional
+            </div>
 
-    <select id="filterOperasiProyekSelect">
-      <option value="">Semua Proyek</option>
-    </select>
-  </div>
+          </div>
+        </div>
 
+        <div
+          id="operasiChartProgress"
+          style="
+            min-height:320px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#7a847d;
+          "
+        >
+          Grafik progres akan ditampilkan di sini
+        </div>
 
-  <div>
-    <label>Urutkan</label>
+      </div>
 
-    <select id="filterOperasiUrutan">
-      <option value="kode">Kode Proyek</option>
-      <option value="nilaiKontrak">Nilai Kontrak</option>
-      <option value="pendapatan">Pendapatan</option>
-      <option value="pencairan">Pencairan</option>
-      <option value="biaya">Biaya</option>
-      <option value="cashflow">Cashflow</option>
-      <option value="profitAndLoss">Profit & Loss</option>
-    </select>
-  </div>
-
-
-</div>
+    </div>
 
 
-<div style="
-  margin-bottom:16px;
-">
+    <!-- DAFTAR PROYEK -->
 
-  <label>Cari Proyek</label>
+    <div
+      class="panel"
+      style="margin-top:20px;"
+    >
 
-  <input
-    type="text"
-    id="filterOperasiProyek"
-    placeholder="Cari kode atau nama proyek..."
-    style="width:100%;"
-  >
+      <div class="sectionhead">
 
-</div>
+        <div>
 
+          <h3>
+            Portofolio Proyek
+          </h3>
 
-        <!-- TABEL PROYEK -->
-
-        <div style="
-          overflow-x:auto;
-          width:100%;
-        ">
-
-          <table
-            id="tableOperasi"
-            style="
-              width:100%;
-              border-collapse:collapse;
-            "
-          >
-
-            <thead>
-
-              <tr>
-
-                <th>No</th>
-                <th>Kode Proyek</th>
-                <th>Nama Proyek</th>
-                <th>Wilayah</th>
-                <th>Nilai Kontrak</th>
-                <th>Pendapatan</th>
-                <th>Pencairan</th>
-                <th>Biaya</th>
-                <th>Cashflow</th>
-                <th>Profit & Loss</th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody id="tableOperasiBody">
-
-              <tr>
-
-                <td
-                  colspan="10"
-                  style="text-align:center;padding:20px;"
-                >
-                  Memuat data proyek...
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
+          <div class="smallmuted">
+            Daftar seluruh proyek operasional
+          </div>
 
         </div>
 
       </div>
 
-       </div>
-      
-  </section>
+
+      <!-- TAB -->
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          margin-bottom:18px;
+          flex-wrap:wrap;
+        "
+      >
+
+        <button
+          type="button"
+          class="operasi-tab active"
+          data-tab="ongoing"
+        >
+          Proyek On Going
+        </button>
+
+        <button
+          type="button"
+          class="operasi-tab"
+          data-tab="portfolio"
+        >
+          Seluruh Portofolio Proyek
+        </button>
+
+        <button
+          type="button"
+          class="operasi-tab"
+          data-tab="bl"
+        >
+          Personil Proyek / BL
+        </button>
+
+        <button
+          type="button"
+          class="operasi-tab"
+          data-tab="btl"
+        >
+          Personil Kantor / BTL
+        </button>
+
+      </div>
+
+
+      <!-- PROJECT CARDS -->
+
+      <div
+        id="operasiProjectCards"
+        style="
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:14px;
+        "
+      >
+
+        <div
+          style="
+            grid-column:1/-1;
+            text-align:center;
+            padding:30px;
+            color:#7a847d;
+          "
+        >
+          Memuat data proyek...
+        </div>
+
+      </div>
+
+
+      <!-- TABEL LAMA - FALLBACK -->
+
+      <div
+        style="
+          overflow-x:auto;
+          width:100%;
+          margin-top:20px;
+          display:none;
+        "
+      >
+
+        <table
+          id="tableOperasi"
+          style="
+            width:100%;
+            border-collapse:collapse;
+          "
+        >
+
+          <thead>
+
+            <tr>
+              <th>No</th>
+              <th>Kode Proyek</th>
+              <th>Nama Proyek</th>
+              <th>Wilayah</th>
+              <th>Nilai Kontrak</th>
+              <th>Pendapatan</th>
+              <th>Pencairan</th>
+              <th>Biaya</th>
+              <th>Cashflow</th>
+              <th>Profit & Loss</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="tableOperasiBody">
+
+            <tr>
+
+              <td
+                colspan="10"
+                style="
+                  text-align:center;
+                  padding:20px;
+                "
+              >
+                Memuat data proyek...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
   <section id="page-paket" class="page">
     <div class="panel"><div class="sectionhead"><div><h3>Kelola Data Paket</h3><div class="smallmuted">Klik Edit untuk membuka form seperti tampilan lama.</div></div><button class="btn primary" id="goAdd2">＋ Tambah Paket</button></div>
       <div class="notice">Status dapat dijadwalkan per tanggal. Contoh: 22 Sep PRAKUALIFIKASI → 23 Sep PROSES LELANG → 24 Sep MENANG/KALAH. Website akan membaca tanggal hari ini dan menampilkan status yang berlaku otomatis.</div>
@@ -777,46 +1065,11 @@ function renderOperasi(){
 
 
       // =====================================
-      // KPI
+      // DATA
       // =====================================
 
-      const d =
+      const data =
         result.data || {};
-
-      const values =
-        page.querySelectorAll('.card .value');
-
-      if(values.length >= 4){
-
-        values[0].textContent =
-          Number(
-            d['Total Paket Proyek'] || 0
-          ).toLocaleString('id-ID');
-
-        values[1].textContent =
-          'Rp ' +
-          Number(
-            d['Nilai Kontrak Total'] || 0
-          ).toLocaleString('id-ID');
-
-        values[2].textContent =
-          'Rp ' +
-          Number(
-            d['Total Pendapatan'] || 0
-          ).toLocaleString('id-ID');
-
-        values[3].textContent =
-          'Rp ' +
-          Number(
-            d['Cashflow'] || 0
-          ).toLocaleString('id-ID');
-
-      }
-
-
-      // =====================================
-      // DATA PROYEK
-      // =====================================
 
       const projects =
         Array.isArray(result.projects)
@@ -824,112 +1077,53 @@ function renderOperasi(){
           : [];
 
 
-      const tableBody =
+      // =====================================
+      // ELEMENT
+      // =====================================
+
+      const filterTahun =
         document.getElementById(
-          'tableOperasiBody'
+          'filterOperasiTahun'
         );
 
-     const filterWilayah =
-  document.getElementById(
-    'filterOperasiWilayah'
-  );
+      const filterWilayah =
+        document.getElementById(
+          'filterOperasiWilayah'
+        );
 
-const filterProyekSelect =
-  document.getElementById(
-    'filterOperasiProyekSelect'
-  );
+      const filterProyekSelect =
+        document.getElementById(
+          'filterOperasiProyekSelect'
+        );
 
-const filterProyek =
-  document.getElementById(
-    'filterOperasiProyek'
-  );
+      const filterUrutan =
+        document.getElementById(
+          'filterOperasiUrutan'
+        );
 
-const filterUrutan =
-  document.getElementById(
-    'filterOperasiUrutan'
-  );
+      const filterProyek =
+        document.getElementById(
+          'filterOperasiProyek'
+        );
 
-const filterTahun =
-  document.getElementById(
-    'filterOperasiTahun'
-  );
+      const projectCards =
+        document.getElementById(
+          'operasiProjectCards'
+        );
 
+      const financialChart =
+        document.getElementById(
+          'operasiChartFinancial'
+        );
 
-if(!tableBody) return;
+      const progressChart =
+        document.getElementById(
+          'operasiChartProgress'
+        );
 
-
-// =====================================
-// FILTER WILAYAH
-// =====================================
-
-if(filterWilayah){
-
-  const wilayahList = [
-    ...new Set(
-      projects
-        .map(p => p.wilayah)
-        .filter(Boolean)
-    )
-  ].sort();
-
-  filterWilayah.innerHTML =
-    '<option value="">Semua Wilayah</option>';
-
-  wilayahList.forEach(wilayah => {
-
-    const option =
-      document.createElement('option');
-
-    option.value = wilayah;
-    option.textContent = wilayah;
-
-    filterWilayah.appendChild(option);
-
-  });
-
-}
-
-
-// =====================================
-// FILTER PROYEK
-// =====================================
-
-if(filterProyekSelect){
-
-  const projectList =
-    [...projects]
-      .sort((a,b) =>
-        String(a.namaProyek || '')
-          .localeCompare(
-            String(b.namaProyek || ''),
-            'id'
-          )
-      );
-
-  filterProyekSelect.innerHTML =
-    '<option value="">Semua Proyek</option>';
-
-  projectList.forEach(project => {
-
-    const option =
-      document.createElement('option');
-
-    option.value =
-      project.kodeProyek || '';
-
-    option.textContent =
-      (project.kodeProyek || '') +
-      ' - ' +
-      (project.namaProyek || '');
-
-    filterProyekSelect.appendChild(option);
-
-  });
-
-}
 
       // =====================================
-      // FORMAT RUPIAH
+      // FORMAT
       // =====================================
 
       function rupiah(value){
@@ -941,11 +1135,7 @@ if(filterProyekSelect){
       }
 
 
-      // =====================================
-      // ESCAPE HTML
-      // =====================================
-
-      function escOperasi(value){
+      function esc(value){
 
         return String(value ?? '')
           .replace(/&/g,'&amp;')
@@ -957,159 +1147,760 @@ if(filterProyekSelect){
       }
 
 
+      function compact(value){
+
+        const n =
+          Number(value || 0);
+
+        if(Math.abs(n) >= 1000000000){
+
+          return 'Rp ' +
+            (n / 1000000000)
+              .toFixed(2)
+              .replace('.',',') +
+            ' M';
+
+        }
+
+        if(Math.abs(n) >= 1000000){
+
+          return 'Rp ' +
+            (n / 1000000)
+              .toFixed(2)
+              .replace('.',',') +
+            ' Jt';
+
+        }
+
+        return rupiah(n);
+
+      }
+
+
+      function num(value){
+
+        return Number(value || 0);
+
+      }
+
+
       // =====================================
-      // RENDER TABEL
+      // WILAYAH
       // =====================================
 
-      function renderTable(){
+      if(filterWilayah){
+
+        const wilayahList =
+          [
+            ...new Set(
+              projects
+                .map(p =>
+                  String(
+                    p.wilayah || ''
+                  ).trim()
+                )
+                .filter(Boolean)
+            )
+          ].sort(
+            (a,b) =>
+              a.localeCompare(
+                b,
+                'id'
+              )
+          );
+
+
+        filterWilayah.innerHTML =
+          '<option value="">Semua Wilayah</option>';
+
+
+        wilayahList.forEach(wilayah => {
+
+          const option =
+            document.createElement('option');
+
+          option.value =
+            wilayah;
+
+          option.textContent =
+            wilayah;
+
+          filterWilayah.appendChild(
+            option
+          );
+
+        });
+
+      }
+
+
+      // =====================================
+      // PROYEK SELECT
+      // =====================================
+
+      function isiFilterProyek(){
+
+        if(!filterProyekSelect)
+          return;
+
 
         const selectedWilayah =
-  filterWilayah
-    ? filterWilayah.value
-    : '';
-
-const selectedProyek =
-  filterProyekSelect
-    ? filterProyekSelect.value
-    : '';
-
-const keyword =
-  filterProyek
-    ? filterProyek.value
-        .toLowerCase()
-        .trim()
-    : '';
+          filterWilayah
+            ? filterWilayah.value
+            : '';
 
 
-let filteredProjects =
-  projects.filter(project => {
+        const list =
+          projects
+            .filter(project => {
 
-    const kode =
-      String(
-        project.kodeProyek || ''
-      ).toLowerCase();
+              return (
+                !selectedWilayah ||
+                String(
+                  project.wilayah || ''
+                ) === selectedWilayah
+              );
 
-    const nama =
-      String(
-        project.namaProyek || ''
-      ).toLowerCase();
+            })
+            .sort((a,b) => {
 
-    const wilayah =
-      String(
-        project.wilayah || ''
-      );
+              const aa =
+                String(
+                  a.namaProyek || ''
+                );
 
+              const bb =
+                String(
+                  b.namaProyek || ''
+                );
 
-    const cocokWilayah =
-      !selectedWilayah ||
-      wilayah === selectedWilayah;
+              return aa.localeCompare(
+                bb,
+                'id'
+              );
 
-
-    const cocokProyek =
-      !selectedProyek ||
-      String(
-        project.kodeProyek || ''
-      ) === selectedProyek;
-
-
-    const cocokKeyword =
-      !keyword ||
-      kode.includes(keyword) ||
-      nama.includes(keyword);
+            });
 
 
-    return (
-      cocokWilayah &&
-      cocokProyek &&
-      cocokKeyword
-    );
-
-  });
+        filterProyekSelect.innerHTML =
+          '<option value="">Semua Proyek</option>';
 
 
-// =====================================
-// URUTKAN DATA
-// =====================================
+        list.forEach(project => {
 
-const urutan =
-  filterUrutan
-    ? filterUrutan.value
-    : 'kode';
+          const option =
+            document.createElement('option');
 
+          option.value =
+            project.kodeProyek || '';
 
-filteredProjects.sort((a,b) => {
+          option.textContent =
+            (
+              project.kodeProyek || ''
+            ) +
+            ' - ' +
+            (
+              project.namaProyek || ''
+            );
 
-  if(urutan === 'kode'){
+          filterProyekSelect.appendChild(
+            option
+          );
 
-    return String(
-      a.kodeProyek || ''
-    ).localeCompare(
-      String(
-        b.kodeProyek || ''
-      ),
-      'id'
-    );
+        });
 
-  }
-
-
-  const nilaiA =
-    Number(
-      urutan === 'nilaiKontrak'
-        ? a.nilaiKontrak
-        : urutan === 'pendapatan'
-        ? a.totalPendapatan
-        : urutan === 'pencairan'
-        ? a.realisasiPencairan
-        : urutan === 'biaya'
-        ? a.realisasiBiaya
-        : urutan === 'cashflow'
-        ? a.cashflow
-        : urutan === 'profitAndLoss'
-        ? a.profitAndLoss
-        : 0
-    ) || 0;
+      }
 
 
-  const nilaiB =
-    Number(
-      urutan === 'nilaiKontrak'
-        ? b.nilaiKontrak
-        : urutan === 'pendapatan'
-        ? b.totalPendapatan
-        : urutan === 'pencairan'
-        ? b.realisasiPencairan
-        : urutan === 'biaya'
-        ? b.realisasiBiaya
-        : urutan === 'cashflow'
-        ? b.cashflow
-        : urutan === 'profitAndLoss'
-        ? b.profitAndLoss
-        : 0
-    ) || 0;
+      isiFilterProyek();
 
 
-  return nilaiB - nilaiA;
+      // =====================================
+      // FILTER DATA
+      // =====================================
 
-});
-        // =================================
-        // TIDAK ADA DATA
-        // =================================
+      function getFilteredProjects(){
 
-        if(!filteredProjects.length){
+        const tahun =
+          filterTahun
+            ? filterTahun.value
+            : '';
 
-          tableBody.innerHTML = `
-            <tr>
-              <td
-                colspan="10"
-                style="
-                  text-align:center;
-                  padding:20px;
-                "
-              >
-                Tidak ada proyek yang sesuai.
-              </td>
-            </tr>
+
+        const wilayah =
+          filterWilayah
+            ? filterWilayah.value
+            : '';
+
+
+        const proyek =
+          filterProyekSelect
+            ? filterProyekSelect.value
+            : '';
+
+
+        const keyword =
+          filterProyek
+            ? filterProyek.value
+                .toLowerCase()
+                .trim()
+            : '';
+
+
+        let list =
+          projects.filter(project => {
+
+            const kode =
+              String(
+                project.kodeProyek || ''
+              ).toLowerCase();
+
+
+            const nama =
+              String(
+                project.namaProyek || ''
+              ).toLowerCase();
+
+
+            const projectWilayah =
+              String(
+                project.wilayah || ''
+              );
+
+
+            const cocokWilayah =
+              !wilayah ||
+              projectWilayah === wilayah;
+
+
+            const cocokProyek =
+              !proyek ||
+              String(
+                project.kodeProyek || ''
+              ) === proyek;
+
+
+            const cocokSearch =
+              !keyword ||
+              kode.includes(keyword) ||
+              nama.includes(keyword);
+
+
+            /*
+             * Data API saat ini belum memiliki
+             * field tahun per proyek yang konsisten.
+             *
+             * Jadi filter tahun tidak mengarang
+             * data tahunan per proyek.
+             */
+            const cocokTahun =
+              !tahun ||
+              String(
+                project.tahun || ''
+              ) === tahun ||
+              String(
+                project.tahunKontrak || ''
+              ) === tahun;
+
+
+            return (
+              cocokWilayah &&
+              cocokProyek &&
+              cocokSearch &&
+              (
+                !tahun ||
+                cocokTahun
+              )
+            );
+
+          });
+
+
+        // =====================================
+        // URUTKAN
+        // =====================================
+
+        const urutan =
+          filterUrutan
+            ? filterUrutan.value
+            : 'kode';
+
+
+        list.sort((a,b) => {
+
+          if(urutan === 'kode'){
+
+            return String(
+              a.kodeProyek || ''
+            ).localeCompare(
+              String(
+                b.kodeProyek || ''
+              ),
+              'id'
+            );
+
+          }
+
+
+          const fieldMap = {
+
+            nilaiKontrak:
+              'nilaiKontrak',
+
+            pendapatan:
+              'totalPendapatan',
+
+            pencairan:
+              'realisasiPencairan',
+
+            biaya:
+              'realisasiBiaya',
+
+            cashflow:
+              'cashflow',
+
+            profitAndLoss:
+              'profitAndLoss'
+
+          };
+
+
+          const field =
+            fieldMap[urutan];
+
+
+          return (
+            num(b[field]) -
+            num(a[field])
+          );
+
+        });
+
+
+        return list;
+
+      }
+
+
+      // =====================================
+      // KPI
+      // =====================================
+
+      function renderKPI(list){
+
+        const totalKontrak =
+          list.reduce(
+            (sum,p) =>
+              sum +
+              num(p.nilaiKontrak),
+            0
+          );
+
+
+        const totalPendapatan =
+          list.reduce(
+            (sum,p) =>
+              sum +
+              num(p.totalPendapatan),
+            0
+          );
+
+
+        const totalPencairan =
+          list.reduce(
+            (sum,p) =>
+              sum +
+              num(p.realisasiPencairan),
+            0
+          );
+
+
+        const totalBiaya =
+          list.reduce(
+            (sum,p) =>
+              sum +
+              num(p.realisasiBiaya),
+            0
+          );
+
+
+        const totalCashflow =
+          list.reduce(
+            (sum,p) =>
+              sum +
+              num(p.cashflow),
+            0
+          );
+
+
+        const kpi = {
+
+          operasiNilaiKontrak:
+            totalKontrak,
+
+          operasiTotalPendapatan:
+            totalPendapatan,
+
+          operasiPendapatan2025:
+            data['Pendapatan Tahun 2025'] || 0,
+
+          operasiPendapatan2026:
+            data['Pendapatan Tahun 2026'] || 0,
+
+          operasiPendapatanBulanIni:
+            data['Pendapatan s/d Bulan Ini'] || 0,
+
+          operasiPencairan:
+            totalPencairan,
+
+          operasiBiaya:
+            totalBiaya,
+
+          operasiCashflow:
+            totalCashflow
+
+        };
+
+
+        Object.keys(kpi).forEach(id => {
+
+          const el =
+            document.getElementById(id);
+
+          if(el){
+
+            el.textContent =
+              rupiah(kpi[id]);
+
+          }
+
+        });
+
+      }
+
+
+      // =====================================
+      // GRAFIK FINANSIAL
+      // =====================================
+
+      function renderFinancialChart(list){
+
+        if(!financialChart)
+          return;
+
+
+        if(!list.length){
+
+          financialChart.innerHTML =
+            '<div>Tidak ada data.</div>';
+
+          return;
+
+        }
+
+
+        const wilayahMap = {};
+
+
+        list.forEach(project => {
+
+          const wilayah =
+            project.wilayah ||
+            'Tanpa Wilayah';
+
+
+          if(!wilayahMap[wilayah]){
+
+            wilayahMap[wilayah] = {
+
+              kontrak:0,
+              pendapatan:0,
+              pencairan:0,
+              biaya:0
+
+            };
+
+          }
+
+
+          wilayahMap[wilayah].kontrak +=
+            num(project.nilaiKontrak);
+
+          wilayahMap[wilayah].pendapatan +=
+            num(project.totalPendapatan);
+
+          wilayahMap[wilayah].pencairan +=
+            num(project.realisasiPencairan);
+
+          wilayahMap[wilayah].biaya +=
+            num(project.realisasiBiaya);
+
+        });
+
+
+        const rows =
+          Object.entries(wilayahMap)
+            .sort(
+              (a,b) =>
+                b[1].kontrak -
+                a[1].kontrak
+            );
+
+
+        const max =
+          Math.max(
+            ...rows.map(
+              x => x[1].kontrak
+            ),
+            1
+          );
+
+
+        financialChart.innerHTML = rows
+          .map(([wilayah,v]) => {
+
+            const width =
+              Math.max(
+                4,
+                (v.kontrak / max) * 100
+              );
+
+
+            return `
+
+              <div style="
+                margin-bottom:18px;
+              ">
+
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  gap:12px;
+                  margin-bottom:6px;
+                  font-size:13px;
+                  font-weight:600;
+                ">
+
+                  <span>
+                    ${esc(wilayah)}
+                  </span>
+
+                  <span>
+                    ${compact(v.kontrak)}
+                  </span>
+
+                </div>
+
+
+                <div style="
+                  height:12px;
+                  background:#e8eee8;
+                  border-radius:10px;
+                  overflow:hidden;
+                ">
+
+                  <div style="
+                    width:${width}%;
+                    height:100%;
+                    background:#176b3a;
+                    border-radius:10px;
+                  "></div>
+
+                </div>
+
+
+                <div style="
+                  display:grid;
+                  grid-template-columns:repeat(3,1fr);
+                  gap:8px;
+                  margin-top:7px;
+                  font-size:11px;
+                  color:#68736c;
+                ">
+
+                  <span>
+                    Pendapatan:
+                    ${compact(v.pendapatan)}
+                  </span>
+
+                  <span>
+                    Pencairan:
+                    ${compact(v.pencairan)}
+                  </span>
+
+                  <span>
+                    Biaya:
+                    ${compact(v.biaya)}
+                  </span>
+
+                </div>
+
+              </div>
+
+            `;
+
+          })
+          .join('');
+
+      }
+
+
+      // =====================================
+      // GRAFIK PROGRESS
+      // =====================================
+
+      function renderProgressChart(list){
+
+        if(!progressChart)
+          return;
+
+
+        if(!list.length){
+
+          progressChart.innerHTML =
+            '<div>Tidak ada data.</div>';
+
+          return;
+
+        }
+
+
+        const statusMap = {};
+
+
+        list.forEach(project => {
+
+          let status =
+            project.status ||
+            project.progres ||
+            project.progress ||
+            project.statusProyek ||
+            project.tahap ||
+            project.keterangan ||
+            'Data Tersedia';
+
+
+          status =
+            String(status)
+              .trim() ||
+              'Data Tersedia';
+
+
+          statusMap[status] =
+            (
+              statusMap[status] || 0
+            ) + 1;
+
+        });
+
+
+        const entries =
+          Object.entries(statusMap)
+            .sort(
+              (a,b) =>
+                b[1] - a[1]
+            );
+
+
+        const total =
+          list.length;
+
+
+        progressChart.innerHTML = `
+
+          <div style="
+            width:100%;
+          ">
+
+            ${entries.map(
+              ([status,count]) => {
+
+                const pct =
+                  (
+                    count / total
+                  ) * 100;
+
+
+                return `
+
+                  <div style="
+                    margin-bottom:13px;
+                  ">
+
+                    <div style="
+                      display:flex;
+                      justify-content:space-between;
+                      font-size:13px;
+                      margin-bottom:5px;
+                    ">
+
+                      <span>
+                        ${esc(status)}
+                      </span>
+
+                      <b>
+                        ${count}
+                        proyek
+                        (${pct.toFixed(1)}%)
+                      </b>
+
+                    </div>
+
+                    <div style="
+                      height:9px;
+                      background:#e8eee8;
+                      border-radius:8px;
+                      overflow:hidden;
+                    ">
+
+                      <div style="
+                        width:${pct}%;
+                        height:100%;
+                        background:#4d8b62;
+                      "></div>
+
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            ).join('')}
+
+          </div>
+
+        `;
+
+      }
+
+
+      // =====================================
+      // PROJECT CARDS
+      // =====================================
+
+      function renderProjectCards(list){
+
+        if(!projectCards)
+          return;
+
+
+        if(!list.length){
+
+          projectCards.innerHTML = `
+
+            <div style="
+              grid-column:1/-1;
+              text-align:center;
+              padding:35px;
+              color:#7a847d;
+            ">
+
+              Tidak ada proyek yang sesuai
+              dengan filter.
+
+            </div>
+
           `;
 
           return;
@@ -1117,127 +1908,441 @@ filteredProjects.sort((a,b) => {
         }
 
 
-        // =================================
-        // ISI TABEL
-        // =================================
+        projectCards.innerHTML =
+          list.map((project,index) => {
 
-        tableBody.innerHTML =
-          filteredProjects
-            .map((project,index) => `
+            const cashflow =
+              num(project.cashflow);
 
-              <tr>
 
-                <td>
-                  ${index + 1}
-                </td>
+            const status =
+              project.status ||
+              project.progres ||
+              project.progress ||
+              project.statusProyek ||
+              project.tahap ||
+              'Data Tersedia';
 
-                <td>
-                  ${escOperasi(
-                    project.kodeProyek
-                  )}
-                </td>
 
-                <td>
-                  ${escOperasi(
-                    project.namaProyek
-                  )}
-                </td>
+            return `
 
-                <td>
-                  ${escOperasi(
-                    project.wilayah
-                  )}
-                </td>
+              <div
+                class="card"
+                data-operasi-project="${esc(
+                  project.kodeProyek || ''
+                )}"
+                style="
+                  cursor:pointer;
+                  transition:.2s;
+                  border:1px solid #e5ebe5;
+                "
+                title="Klik untuk melihat detail proyek"
+              >
 
-                <td>
-                  ${rupiah(
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  gap:10px;
+                  align-items:flex-start;
+                ">
+
+                  <div>
+
+                    <div style="
+                      font-size:12px;
+                      color:#6c776f;
+                      margin-bottom:4px;
+                    ">
+                      ${esc(
+                        project.kodeProyek || '-'
+                      )}
+                    </div>
+
+                    <div style="
+                      font-size:16px;
+                      font-weight:700;
+                      color:#164c2f;
+                      line-height:1.35;
+                    ">
+                      ${esc(
+                        project.namaProyek || '-'
+                      )}
+                    </div>
+
+                  </div>
+
+                  <span style="
+                    font-size:11px;
+                    background:#eef5ee;
+                    color:#176b3a;
+                    padding:5px 8px;
+                    border-radius:12px;
+                    white-space:nowrap;
+                  ">
+                    ${esc(status)}
+                  </span>
+
+                </div>
+
+
+                <div style="
+                  margin-top:15px;
+                  display:grid;
+                  grid-template-columns:1fr 1fr;
+                  gap:10px;
+                ">
+
+                  <div>
+                    <div class="smallmuted">
+                      Wilayah
+                    </div>
+
+                    <b>
+                      ${esc(
+                        project.wilayah || '-'
+                      )}
+                    </b>
+                  </div>
+
+
+                  <div>
+                    <div class="smallmuted">
+                      Nilai Kontrak
+                    </div>
+
+                    <b>
+                      ${compact(
+                        project.nilaiKontrak
+                      )}
+                    </b>
+                  </div>
+
+
+                  <div>
+                    <div class="smallmuted">
+                      Pendapatan
+                    </div>
+
+                    <b>
+                      ${compact(
+                        project.totalPendapatan
+                      )}
+                    </b>
+                  </div>
+
+
+                  <div>
+                    <div class="smallmuted">
+                      Pencairan
+                    </div>
+
+                    <b>
+                      ${compact(
+                        project.realisasiPencairan
+                      )}
+                    </b>
+                  </div>
+
+
+                  <div>
+                    <div class="smallmuted">
+                      Realisasi Biaya
+                    </div>
+
+                    <b>
+                      ${compact(
+                        project.realisasiBiaya
+                      )}
+                    </b>
+                  </div>
+
+
+                  <div>
+                    <div class="smallmuted">
+                      Cashflow
+                    </div>
+
+                    <b style="
+                      color:${cashflow >= 0
+                        ? '#176b3a'
+                        : '#b42318'};
+                    ">
+                      ${compact(cashflow)}
+                    </b>
+                  </div>
+
+                </div>
+
+
+                <div style="
+                  margin-top:15px;
+                  padding-top:12px;
+                  border-top:1px solid #edf1ed;
+                  font-size:12px;
+                  color:#176b3a;
+                  font-weight:600;
+                ">
+                  Klik untuk detail proyek →
+                </div>
+
+              </div>
+
+            `;
+
+          })
+          .join('');
+
+
+        projectCards
+          .querySelectorAll(
+            '[data-operasi-project]'
+          )
+          .forEach(card => {
+
+            card.addEventListener(
+              'click',
+              () => {
+
+                const kode =
+                  card.dataset
+                    .operasiProject;
+
+
+                const project =
+                  projects.find(
+                    p =>
+                      String(
+                        p.kodeProyek || ''
+                      ) === String(kode)
+                  );
+
+
+                if(!project)
+                  return;
+
+
+                alert(
+
+                  'DETAIL PROYEK\n\n' +
+
+                  'Kode: ' +
+                  (
+                    project.kodeProyek || '-'
+                  ) +
+
+                  '\nNama: ' +
+                  (
+                    project.namaProyek || '-'
+                  ) +
+
+                  '\nWilayah: ' +
+                  (
+                    project.wilayah || '-'
+                  ) +
+
+                  '\n\nNilai Kontrak: ' +
+                  rupiah(
                     project.nilaiKontrak
-                  )}
-                </td>
+                  ) +
 
-                <td>
-                  ${rupiah(
+                  '\nPendapatan: ' +
+                  rupiah(
                     project.totalPendapatan
-                  )}
-                </td>
+                  ) +
 
-                <td>
-                  ${rupiah(
+                  '\nPencairan: ' +
+                  rupiah(
                     project.realisasiPencairan
-                  )}
-                </td>
+                  ) +
 
-                <td>
-                  ${rupiah(
+                  '\nBiaya: ' +
+                  rupiah(
                     project.realisasiBiaya
-                  )}
-                </td>
+                  ) +
 
-                <td>
-                  ${rupiah(
+                  '\nCashflow: ' +
+                  rupiah(
                     project.cashflow
-                  )}
-                </td>
+                  )
 
-                <td>
-                  ${rupiah(
-                    project.profitAndLoss
-                  )}
-                </td>
+                );
 
-              </tr>
+              }
+            );
 
-            `)
-            .join('');
+          });
 
       }
 
 
       // =====================================
-      // FILTER EVENT
+      // RENDER SEMUA
+      // =====================================
+
+      function renderAll(){
+
+        const list =
+          getFilteredProjects();
+
+
+        renderKPI(list);
+
+        renderFinancialChart(list);
+
+        renderProgressChart(list);
+
+        renderProjectCards(list);
+
+      }
+
+
+      // =====================================
+      // EVENT FILTER
       // =====================================
 
       if(filterWilayah){
 
         filterWilayah.onchange =
-          renderTable;
+          () => {
+
+            isiFilterProyek();
+
+            if(filterProyekSelect){
+
+              filterProyekSelect.value =
+                '';
+
+            }
+
+            renderAll();
+
+          };
 
       }
+
+
+      if(filterProyekSelect){
+
+        filterProyekSelect.onchange =
+          renderAll;
+
+      }
+
 
       if(filterProyek){
 
         filterProyek.oninput =
-          renderTable;
+          renderAll;
 
       }
-if(filterProyekSelect){
 
-  filterProyekSelect.onchange =
-    renderTable;
 
-}
+      if(filterUrutan){
 
-if(filterUrutan){
+        filterUrutan.onchange =
+          renderAll;
 
-  filterUrutan.onchange =
-    renderTable;
+      }
 
-}
+
+      if(filterTahun){
+
+        filterTahun.onchange =
+          renderAll;
+
+      }
+
 
       // =====================================
-      // RENDER PERTAMA
+      // TAB
       // =====================================
 
-      renderTable();
+      page
+        .querySelectorAll(
+          '.operasi-tab'
+        )
+        .forEach(tab => {
+
+          tab.onclick = function(){
+
+            page
+              .querySelectorAll(
+                '.operasi-tab'
+              )
+              .forEach(t =>
+                t.classList.remove(
+                  'active'
+                )
+              );
+
+
+            this.classList.add(
+              'active'
+            );
+
+
+            const type =
+              this.dataset.tab;
+
+
+            if(
+              type === 'bl' ||
+              type === 'btl'
+            ){
+
+              if(projectCards){
+
+                projectCards.innerHTML = `
+
+                  <div style="
+                    grid-column:1/-1;
+                    text-align:center;
+                    padding:40px;
+                    color:#7a847d;
+                  ">
+
+                    Data personil
+                    ${
+                      type === 'bl'
+                        ? 'proyek / BL'
+                        : 'kantor / BTL'
+                    }
+                    belum tersedia
+                    pada API Dashboard Operasi.
+
+                  </div>
+
+                `;
+
+              }
+
+              return;
+
+            }
+
+
+            renderAll();
+
+          };
+
+        });
+
+
+      // =====================================
+      // RENDER AWAL
+      // =====================================
+
+      renderAll();
 
 
       console.log(
-        'Berhasil mengambil ' +
-        projects.length +
-        ' proyek operasi.'
+        'Dashboard Operasi:',
+        projects.length,
+        'proyek'
       );
 
     })
+
 
     .catch(error => {
 
@@ -1247,25 +2352,21 @@ if(filterUrutan){
       );
 
 
-      const tableBody =
-        document.getElementById(
-          'tableOperasiBody'
-        );
+      if(projectCards){
 
-      if(tableBody){
+        projectCards.innerHTML = `
 
-        tableBody.innerHTML = `
-          <tr>
-            <td
-              colspan="10"
-              style="
-                text-align:center;
-                padding:20px;
-              "
-            >
-              Gagal memuat data proyek.
-            </td>
-          </tr>
+          <div style="
+            grid-column:1/-1;
+            text-align:center;
+            padding:40px;
+            color:#b42318;
+          ">
+
+            Gagal memuat data Dashboard Operasi.
+
+          </div>
+
         `;
 
       }
