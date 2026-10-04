@@ -2337,15 +2337,35 @@ document
       return `
 
         <div
-          class="card"
-          data-operasi-project="${esc(
-            project.kodeProyek || ''
-          )}"
-          style="
-            cursor:pointer;
-            transition:.2s;
-            border:1px solid #e5ebe5;
-          "
+  class="card"
+  data-operasi-project="${esc(
+    project.kodeProyek || ''
+  )}"
+  <!-- NOMOR URUT -->
+          <div style="
+            position:absolute;
+            top:12px;
+            left:12px;
+            width:30px;
+            height:30px;
+            border-radius:50%;
+            background:#164c2f;
+            color:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:12px;
+            font-weight:700;
+          ">
+            ${String(index + 1).padStart(2,'0')}
+          </div>
+         style="
+  position:relative;
+  cursor:pointer;
+  transition:.2s;
+  border:1px solid #e5ebe5;
+  padding-top:18px;
+"
           title="Klik untuk melihat detail proyek"
         >
 
@@ -2474,9 +2494,9 @@ document
               </div>
 
               <b>
-               ${compact(
-                  pencairan
-                )}
+              ${rupiah(
+  pencairan
+)}
               </b>
 
               <span style="
@@ -2499,8 +2519,8 @@ document
               </div>
 
               <b>
-               ${compact(
-                  biaya
+              ${rupiah(
+  biaya
                 )}
               </b>
 
