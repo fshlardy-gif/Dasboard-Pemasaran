@@ -242,15 +242,17 @@ body.logged-out .app{display:none}
   <div class="panel">
 
     <!-- HEADER -->
-    <div class="sectionhead">
-      <div>
-        <h2>Dashboard Operasi</h2>
-        <div class="smallmuted">
-          Monitoring Operasional Proyek
-        </div>
-      </div>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+  <h2 style="margin:0;">Dashboard Operasi</h2>
 
+  <button
+    class="btn secondary"
+    id="refreshOperasiBtn"
+    type="button"
+  >
+    🔄 Refresh Data
+  </button>
+</div>
     <div class="notice">
       Data operasional tersinkronisasi dari database operasi.
     </div>
@@ -1031,7 +1033,67 @@ function showPage(page){
   if(page==='personil')renderPersonil();
   if(page==='log')renderLogs();
 }
-function renderOperasi(){
+function refreshDataOperasiDashboard(){
+
+  const btn =
+    document.getElementById('refreshOperasiBtn');
+
+  if(btn){
+    btn.disabled = true;
+    btn.innerText = '⏳ Refreshing...';
+  }
+
+  const url =
+    'https://script.google.com/macros/s/AKfycbwyo-ll_gVNx_Tz2Sedt9_mjscXAk0tvunoyv-9TN94b-GEZqMIAv5zbGs6FAVhmgWUjw/exec?action=refresh';
+
+  fetch(url)
+
+    .then(response => response.json())
+
+    .then(result => {
+
+      if(!result.success){
+        throw new Error(
+          result.message ||
+          'Refresh data gagal.'
+        );
+      }
+
+      alert(
+        'Data operasi berhasil diperbarui.'
+      );
+
+      renderOperasi();
+
+    })
+
+    .catch(error => {
+
+      alert(
+        'Refresh data gagal: ' +
+        error.message
+      );
+
+    })
+
+    .finally(() => {
+
+      if(btn){
+        btn.disabled = false;
+        btn.innerText = '🔄 Refresh Data';
+      }
+
+    });
+
+}
+
+document
+  .getElementById('refreshOperasiBtn')
+  ?.addEventListener(
+    'click',
+    refreshDataOperasiDashboard
+  );
+  function renderOperasi(){
 
   const url =
     'https://script.google.com/macros/s/AKfycbwyo-ll_gVNx_Tz2Sedt9_mjscXAk0tvunoyv-9TN94b-GEZqMIAv5zbGs6FAVhmgWUjw/exec';
