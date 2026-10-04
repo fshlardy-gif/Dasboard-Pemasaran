@@ -2288,7 +2288,10 @@ document
 
       const pendapatan =
         num(project.totalPendapatan);
-
+      
+const pendapatanBulanIni =
+  num(project.pendapatanBulanIni);
+      
       const pencairan =
         num(project.realisasiPencairan);
 
@@ -2313,7 +2316,8 @@ document
           ) * 100;
 
         };
-
+const persenPendapatanBulanIni =
+  persen(pendapatanBulanIni);
 
       const persenPencairan =
         persen(pencairan);
@@ -2485,29 +2489,45 @@ document
             </div>
 
 
-            <!-- PENCAIRAN -->
-            <div>
+           <!-- PENDAPATAN S/D BULAN INI -->
+<div>
 
-              <div class="smallmuted">
-                Pencairan
-              </div>
+  <div class="smallmuted">
+    Pendapatan s/d Bulan Ini
+  </div>
 
-              <b>
-              ${rupiah(
-  pencairan
-)}
-              </b>
+  <b>
+    ${rupiah(
+      pendapatanBulanIni
+    )}
+  </b>
 
-              <span style="
-                font-size:11px;
-                color:#176b3a;
-                font-weight:600;
-                margin-left:4px;
-              ">
-                ${persenPencairan.toFixed(2)}%
-              </span>
+  <span style="
+    font-size:11px;
+    color:#176b3a;
+    font-weight:600;
+    margin-left:4px;
+  ">
+    ${persenPendapatanBulanIni.toFixed(2)}%
+  </span>
 
-            </div>
+</div>
+
+
+<!-- PENCAIRAN -->
+<div>
+
+  <div class="smallmuted">
+    Pencairan
+  </div>
+
+  <b>
+    ${rupiah(
+      pencairan
+    )}
+  </b>
+
+</div>
 
 
             <!-- BIAYA -->
@@ -2566,56 +2586,55 @@ document
           </div>
 
 
-          <!-- PROGRESS PENCAIRAN -->
-          <div style="
-            margin-top:16px;
-          ">
+          <!-- PROGRESS PENDAPATAN S/D BULAN INI -->
+<div style="
+  margin-top:16px;
+">
 
-            <div style="
-              display:flex;
-              justify-content:space-between;
-              font-size:11px;
-              color:#6c776f;
-              margin-bottom:5px;
-            ">
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:#6c776f;
+    margin-bottom:5px;
+  ">
 
-              <span>
-                Pencairan terhadap Pendapatan
-              </span>
+    <span>
+      Pendapatan s/d Bulan Ini terhadap Total Pendapatan
+    </span>
 
-              <strong style="
-                color:#176b3a;
-              ">
-                ${persenPencairan.toFixed(2)}%
-              </strong>
+    <strong style="
+      color:#176b3a;
+    ">
+      ${persenPendapatanBulanIni.toFixed(2)}%
+    </strong>
 
-            </div>
+  </div>
 
 
-            <div style="
-              height:6px;
-              background:#e9eee9;
-              border-radius:10px;
-              overflow:hidden;
-            ">
+  <div style="
+    height:6px;
+    background:#e9eee9;
+    border-radius:10px;
+    overflow:hidden;
+  ">
 
-              <div style="
-                width:${Math.min(
-                  Math.max(
-                    persenPencairan,
-                    0
-                  ),
-                  100
-                )}%;
-                height:100%;
-                background:#176b3a;
-                border-radius:10px;
-              "></div>
+    <div style="
+      width:${Math.min(
+        Math.max(
+          persenPendapatanBulanIni,
+          0
+        ),
+        100
+      )}%;
+      height:100%;
+      background:#176b3a;
+      border-radius:10px;
+    "></div>
 
-            </div>
+  </div>
 
-          </div>
-
+</div>
 
           <!-- PROGRESS BIAYA -->
           <div style="
