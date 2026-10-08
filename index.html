@@ -503,7 +503,7 @@ body.logged-out .app{display:none}
             </h3>
 
             <div class="smallmuted">
-              Nilai kontrak, pendapatan, pencairan dan biaya
+              Nilai kontrak, pendapatan, pencairan, biaya dan cashflow
             </div>
 
           </div>
@@ -1682,14 +1682,15 @@ const personilBL =
 
     if(!wilayahMap[wilayah]){
 
-      wilayahMap[wilayah] = {
+     wilayahMap[wilayah] = {
 
-        kontrak:0,
-        pendapatan:0,
-        pencairan:0,
-        biaya:0
+  kontrak:0,
+  pendapatan:0,
+  pencairan:0,
+  biaya:0,
+  cashflow:0
 
-      };
+};
 
     }
 
@@ -1705,17 +1706,128 @@ const personilBL =
 
     wilayahMap[wilayah].biaya +=
       num(project.realisasiBiaya);
-
+    
+wilayahMap[wilayah].cashflow +=
+  num(project.cashflow);
   });
 
 
-  const data =
-    Object.entries(wilayahMap)
-      .sort(
-        (a,b) =>
+ const data =
+  Object.entries(wilayahMap)
+    .sort(
+      (a,b) => {
+
+        const namaA =
+          String(a[0] || '').trim();
+
+        const namaB =
+          String(b[0] || '').trim();
+
+        const isWilayahA =
+          /^Wilayah\b/i.test(namaA);
+
+        const isWilayahB =
+          /^Wilayah\b/i.test(namaB);
+
+        // DIVISI / NON-WILAYAH DITAMPILKAN DAHULU
+        if (
+          isWilayahA !== isWilayahB
+        ) {
+
+          return isWilayahA
+            ? 1
+            : -1;
+
+        }
+
+        // URUTAN WILAYAH I, II, III, IV, V, VI
+        if (
+          isWilayahA &&
+          isWilayahB
+        ) {
+
+          const romanValues = {
+            I:1,
+            V:5,
+            X:10,
+            L:50,
+            C:100,
+            D:500,
+            M:1000
+          };
+
+          function romanToNumber(
+            roman
+          ){
+
+            let total = 0;
+
+            for(
+              let i = 0;
+              i < roman.length;
+              i++
+            ){
+
+              const current =
+                romanValues[
+                  roman[i]
+                ] || 0;
+
+              const next =
+                romanValues[
+                  roman[i + 1]
+                ] || 0;
+
+              total +=
+                current < next
+                  ? -current
+                  : current;
+
+            }
+
+            return total;
+
+          }
+
+          const ambilNomorWilayah =
+            nama => {
+
+              const match =
+                nama.match(
+                  /^Wilayah\s+([IVXLCDM]+)/i
+                );
+
+              return match
+                ? romanToNumber(
+                    match[1].toUpperCase()
+                  )
+                : 999;
+
+            };
+
+          const nomorA =
+            ambilNomorWilayah(
+              namaA
+            );
+
+          const nomorB =
+            ambilNomorWilayah(
+              namaB
+            );
+
+          return nomorA - nomorB;
+
+        }
+
+        // DIVISI TETAP MENGIKUTI URUTAN
+        // PENDAPATAN TERBESAR
+        return (
           b[1].pendapatan -
           a[1].pendapatan
-      );
+        );
+
+      }
+    );
 
 
   if(!data.length){
@@ -1895,6 +2007,21 @@ const personilBL =
           Biaya
         </span>
 
+        <!-- CASHFLOW -->
+
+        <span>
+          <i style="
+            display:inline-block;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#6d3bb8;
+            margin-right:5px;
+          "></i>
+
+          Cashflow
+        </span>
+        
       </div>
 
 
@@ -1906,8 +2033,8 @@ const personilBL =
         display:grid;
 
         grid-template-columns:
-          minmax(180px,1.35fr)
-          repeat(4,minmax(135px,1fr));
+  minmax(180px,1.35fr)
+  repeat(5,minmax(135px,1fr));
 
         gap:12px;
 
@@ -1950,7 +2077,11 @@ const personilBL =
         ">
           Biaya
         </div>
-
+<div style="
+  text-align:right;
+">
+  Cashflow
+</div>
       </div>
 
 
@@ -2001,7 +2132,7 @@ const personilBL =
 
             grid-template-columns:
               minmax(180px,1.35fr)
-              repeat(4,minmax(135px,1fr));
+              repeat(5,minmax(135px,1fr));
 
             gap:12px;
 
@@ -2224,7 +2355,45 @@ const personilBL =
             </div>
 
           </div>
+          <!-- =========================== -->
+          <!-- CASHFLOW -->
+          <!-- =========================== -->
 
+          <div style="
+            text-align:right;
+            min-width:0;
+          ">
+
+            <div style="
+              font-size:12px;
+              font-weight:700;
+
+              color:#6d3bb8;
+
+              white-space:nowrap;
+            ">
+              ${formatRupiah(
+                x.cashflow
+              )}
+            </div>
+
+
+            <div style="
+              font-size:10px;
+
+              color:#7a847d;
+
+              margin-top:3px;
+            ">
+              ${persen(
+                x.cashflow,
+                x.pendapatan
+              ).toFixed(2)}%
+
+              dari pendapatan
+            </div>
+
+          </div>
 
         </div>
 
