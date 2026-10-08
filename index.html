@@ -2368,7 +2368,13 @@ wilayahMap[wilayah].cashflow +=
               font-size:12px;
               font-weight:700;
 
-              color:#6d3bb8;
+              color:${
+  x.cashflow < 0
+    ? '#a94b3d'
+    : x.cashflow > 0
+      ? '#6d3bb8'
+      : '#7a847d'
+};
 
               white-space:nowrap;
             ">
