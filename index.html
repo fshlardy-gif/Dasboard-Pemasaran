@@ -1575,6 +1575,32 @@ const personilBL =
             0
           );
 
+const totalPendapatan2025 =
+  list.reduce(
+    (sum,p) =>
+      sum +
+      num(p.pendapatan2025),
+    0
+  );
+
+
+const totalPendapatan2026 =
+  list.reduce(
+    (sum,p) =>
+      sum +
+      num(p.pendapatan2026),
+    0
+  );
+
+
+const totalPendapatanBulanIni =
+  list.reduce(
+    (sum,p) =>
+      sum +
+      num(p.pendapatanBulanIni),
+    0
+  );
+
 
         const totalPencairan =
           list.reduce(
@@ -1612,13 +1638,13 @@ const personilBL =
             totalPendapatan,
 
           operasiPendapatan2025:
-            data['Pendapatan Tahun 2025'] || 0,
+  totalPendapatan2025,
 
-          operasiPendapatan2026:
-            data['Pendapatan Tahun 2026'] || 0,
+operasiPendapatan2026:
+  totalPendapatan2026,
 
-          operasiPendapatanBulanIni:
-            data['Pendapatan s/d Bulan Ini'] || 0,
+operasiPendapatanBulanIni:
+  totalPendapatanBulanIni,
 
           operasiPencairan:
             totalPencairan,
