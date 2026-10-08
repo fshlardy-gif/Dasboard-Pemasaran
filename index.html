@@ -1140,6 +1140,10 @@ document
           ? result.projects
           : [];
 
+const personilBL =
+  Array.isArray(result.personilBL)
+    ? result.personilBL
+    : [];
 
       // =====================================
       // ELEMENT
@@ -2708,134 +2712,462 @@ const persenPendapatanBulanIni =
     .join('');
 
 
-  // =====================================
-  // EVENT DETAIL PROYEK
-  // =====================================
+ // =====================================
+// EVENT PERSONIL BL
+// =====================================
 
-  projectCards
-    .querySelectorAll(
-      '[data-operasi-project]'
-    )
-    .forEach(card => {
+projectCards
+  .querySelectorAll(
+    '[data-operasi-project]'
+  )
+  .forEach(card => {
 
-      card.addEventListener(
-        'click',
-        () => {
+    card.addEventListener(
+      'click',
+      () => {
 
-          const kode =
-            card.dataset
-              .operasiProject;
+        const kode =
+          card.dataset
+            .operasiProject;
 
-
-          const project =
-            projects.find(
-              p =>
-                String(
-                  p.kodeProyek || ''
-                ) === String(kode)
-            );
-
-
-          if(!project)
-            return;
-
-
-          const pendapatan =
-            num(
-              project.totalPendapatan
-            );
-
-          const pencairan =
-            num(
-              project.realisasiPencairan
-            );
-
-          const biaya =
-            num(
-              project.realisasiBiaya
-            );
-
-          const cashflow =
-            num(
-              project.cashflow
-            );
-
-
-          const persen =
-            value =>
-              pendapatan > 0
-                ? (
-                    value /
-                    pendapatan
-                  ) * 100
-                : 0;
-
-
-          alert(
-
-            'DETAIL PROYEK\n\n' +
-
-            'Kode: ' +
-            (
-              project.kodeProyek || '-'
-            ) +
-
-            '\nNama: ' +
-            (
-              project.namaProyek || '-'
-            ) +
-
-            '\nWilayah: ' +
-            (
-              project.wilayah || '-'
-            ) +
-
-            '\n\nNilai Kontrak: ' +
-            rupiah(
-              project.nilaiKontrak
-            ) +
-
-            '\nTotal Pendapatan: ' +
-            rupiah(
-              pendapatan
-            ) +
-            ' (100%)' +
-
-            '\nPencairan: ' +
-            rupiah(
-              pencairan
-            ) +
-            ' (' +
-            persen(pencairan)
-              .toFixed(2) +
-            '%)' +
-
-            '\nBiaya: ' +
-            rupiah(
-              biaya
-            ) +
-            ' (' +
-            persen(biaya)
-              .toFixed(2) +
-            '%)' +
-
-            '\nCashflow: ' +
-            rupiah(
-              cashflow
-            ) +
-            ' (' +
-            persen(cashflow)
-              .toFixed(2) +
-            '%)'
-
+        const project =
+          projects.find(
+            p =>
+              String(
+                p.kodeProyek || ''
+              ) === String(kode)
           );
 
+        if(!project)
+          return;
+
+
+        // =====================================
+        // CARI PERSONIL BL PROYEK
+        // =====================================
+
+        const daftarPersonil =
+          personilBL.filter(
+            p =>
+              String(
+                p.kodeProyek || ''
+              ).trim() ===
+              String(kode || '').trim()
+          );
+
+
+        // =====================================
+        // FORMAT TANGGAL
+        // =====================================
+
+        const formatTanggal =
+          value => {
+
+            if(!value)
+              return '-';
+
+            const d =
+              new Date(value);
+
+            if(
+              Number.isNaN(
+                d.getTime()
+              )
+            ){
+
+              return String(value);
+
+            }
+
+            return d.toLocaleDateString(
+              'id-ID'
+            );
+
+          };
+
+
+        // =====================================
+        // BUAT MODAL
+        // =====================================
+
+        const oldModal =
+          document.getElementById(
+            'operasiPersonilBLModal'
+          );
+
+        if(oldModal)
+          oldModal.remove();
+
+
+        const modal =
+          document.createElement(
+            'div'
+          );
+
+        modal.id =
+          'operasiPersonilBLModal';
+
+        modal.style.cssText = `
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,.45);
+          z-index:99999;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          padding:20px;
+        `;
+
+
+        const namaProyek =
+          project.namaProyek ||
+          '-';
+
+
+        // =====================================
+        // ISI TABEL PERSONIL
+        // =====================================
+
+        let isiTabel = '';
+
+
+        if(
+          daftarPersonil.length === 0
+        ){
+
+          isiTabel = `
+            <div style="
+              padding:35px 20px;
+              text-align:center;
+              color:#6b756f;
+              font-size:14px;
+            ">
+              Belum ada data personil BL
+              untuk proyek ini.
+            </div>
+          `;
+
+        }else{
+
+          isiTabel = `
+            <div style="
+              overflow-x:auto;
+              max-height:55vh;
+              overflow-y:auto;
+            ">
+
+              <table style="
+                width:100%;
+                border-collapse:collapse;
+                font-size:12px;
+              ">
+
+                <thead>
+
+                  <tr style="
+                    background:#f3f7f3;
+                    position:sticky;
+                    top:0;
+                    z-index:1;
+                  ">
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:center;
+                      white-space:nowrap;
+                    ">
+                      No
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:left;
+                      white-space:nowrap;
+                    ">
+                      NIK
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:left;
+                      white-space:nowrap;
+                    ">
+                      Nama
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:left;
+                      white-space:nowrap;
+                    ">
+                      Posisi
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:center;
+                      white-space:nowrap;
+                    ">
+                      Mulai
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:center;
+                      white-space:nowrap;
+                    ">
+                      Selesai
+                    </th>
+
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:left;
+                      white-space:nowrap;
+                    ">
+                      Jobdesk
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  ${
+                    daftarPersonil
+                      .map(
+                        (p, index) => `
+                          <tr>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              text-align:center;
+                            ">
+                              ${index + 1}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              white-space:nowrap;
+                            ">
+                              ${esc(p.nik || '-')}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              font-weight:600;
+                              white-space:nowrap;
+                            ">
+                              ${esc(p.nama || '-')}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                            ">
+                              ${esc(p.posisi || '-')}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              text-align:center;
+                              white-space:nowrap;
+                            ">
+                              ${esc(
+                                formatTanggal(
+                                  p.mulai
+                                )
+                              )}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              text-align:center;
+                              white-space:nowrap;
+                            ">
+                              ${esc(
+                                formatTanggal(
+                                  p.selesai
+                                )
+                              )}
+                            </td>
+
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              min-width:220px;
+                            ">
+                              ${esc(
+                                p.jobdesk || '-'
+                              )}
+                            </td>
+
+                          </tr>
+                        `
+                      )
+                      .join('')
+                  }
+
+                </tbody>
+
+              </table>
+
+            </div>
+          `;
+
         }
-      );
 
-    });
 
-}
+        // =====================================
+        // RENDER MODAL
+        // =====================================
+
+        modal.innerHTML = `
+
+          <div style="
+            width:min(1200px, 96vw);
+            max-height:90vh;
+            background:#ffffff;
+            border-radius:14px;
+            box-shadow:0 20px 60px rgba(0,0,0,.25);
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+          ">
+
+            <!-- HEADER -->
+
+            <div style="
+              padding:18px 22px;
+              border-bottom:1px solid #e6ece6;
+              display:flex;
+              justify-content:space-between;
+              align-items:flex-start;
+              gap:15px;
+            ">
+
+              <div>
+
+                <div style="
+                  font-size:16px;
+                  font-weight:700;
+                  color:#176b3a;
+                ">
+                  Personil BL
+                </div>
+
+                <div style="
+                  margin-top:5px;
+                  font-size:13px;
+                  font-weight:600;
+                  color:#27342d;
+                ">
+                  ${esc(kode)}
+                  — 
+                  ${esc(namaProyek)}
+                </div>
+
+                <div style="
+                  margin-top:5px;
+                  font-size:12px;
+                  color:#7a847d;
+                ">
+                  ${
+                    daftarPersonil.length
+                  } personil
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                id="closeOperasiPersonilBL"
+                style="
+                  border:0;
+                  background:#f1f4f1;
+                  width:34px;
+                  height:34px;
+                  border-radius:50%;
+                  font-size:22px;
+                  cursor:pointer;
+                  color:#53615a;
+                "
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <!-- BODY -->
+
+            <div style="
+              padding:18px 22px 22px;
+              overflow:auto;
+            ">
+
+              ${isiTabel}
+
+            </div>
+
+          </div>
+
+        `;
+
+
+        document.body.appendChild(
+          modal
+        );
+
+
+        // =====================================
+        // TUTUP MODAL
+        // =====================================
+
+        document
+          .getElementById(
+            'closeOperasiPersonilBL'
+          )
+          ?.addEventListener(
+            'click',
+            () => {
+              modal.remove();
+            }
+          );
+
+
+        modal.addEventListener(
+          'click',
+          event => {
+
+            if(
+              event.target === modal
+            ){
+
+              modal.remove();
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+  });
       // =====================================
       // RENDER SEMUA
       // =====================================
