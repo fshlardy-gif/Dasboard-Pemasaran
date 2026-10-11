@@ -3170,8 +3170,15 @@ projectCards
                       white-space:nowrap;
                     ">
                       Jobdesk
+                       </th>
+                    <th style="
+                      padding:10px;
+                      border-bottom:1px solid #dfe7df;
+                      text-align:center;
+                      white-space:nowrap;
+                    ">
+                      Absensi
                     </th>
-
                   </tr>
 
                 </thead>
@@ -3249,9 +3256,27 @@ projectCards
                             ">
                               ${esc(
                                 p.jobdesk || '-'
-                              )}
+                            )}
                             </td>
 
+                            <td style="
+                              padding:9px 10px;
+                              border-bottom:1px solid #edf1ed;
+                              min-width:180px;
+                              line-height:1.7;
+                              white-space:nowrap;
+                            ">
+                              ${
+                                [p.hadir, p.izin, p.sakit, p.alpha].some(
+                                  v => v !== '' && v !== null && v !== undefined
+                                )
+                                  ? 'Hadir: ' + (p.hadir !== '' && p.hadir != null ? esc(p.hadir) : '-') +
+                                    '<br>Izin: ' + (p.izin !== '' && p.izin != null ? esc(p.izin) : '-') +
+                                    '<br>Sakit: ' + (p.sakit !== '' && p.sakit != null ? esc(p.sakit) : '-') +
+                                    '<br>Alpha: ' + (p.alpha !== '' && p.alpha != null ? esc(p.alpha) : '-')
+                                  : 'Tidak ada data absensi'
+                              }
+                            </td>
                           </tr>
                         `
                       )
