@@ -3434,6 +3434,116 @@ projectCards
   });
       }
       // =====================================
+      // GRAFIK DISTRIBUSI STATUS PROGRES PROYEK
+      // =====================================
+
+      function renderProgressChart(list) {
+        const chart = document.getElementById('operasiChartProgress');
+        if (!chart) return;
+
+        const statusMap = new Map();
+
+        (Array.isArray(list) ? list : []).forEach(project => {
+          const rawStatus =
+            project.status ||
+            project.progres ||
+            project.progress ||
+            project.statusProyek ||
+            project.tahap ||
+            'Data Tersedia';
+
+          const label = String(rawStatus).trim() || 'Data Tersedia';
+          const key = label.toLocaleLowerCase('id-ID');
+
+          if (!statusMap.has(key)) {
+            statusMap.set(key, { label, count: 0 });
+          }
+
+          statusMap.get(key).count += 1;
+        });
+
+        const rows = [...statusMap.values()].sort(
+          (a, b) => b.count - a.count ||
+            a.label.localeCompare(b.label, 'id')
+        );
+
+        const total = rows.reduce((sum, row) => sum + row.count, 0);
+
+        if (!total) {
+          chart.innerHTML = `
+            <div style="padding:35px;text-align:center;color:#7a847d;width:100%;">
+              Tidak ada data proyek untuk ditampilkan.
+            </div>
+          `;
+          return;
+        }
+
+        const palette = [
+          '#0b6b47', '#4d9a6a', '#d39a3c', '#cc5a52',
+          '#6e58b5', '#2780d9', '#87958d', '#c76b9b'
+        ];
+
+        const colorForStatus = (label, index) => {
+          if (/selesai|complete|completed|finish|serah terima/i.test(label))
+            return '#198754';
+          if (/berjalan|on\s?going|proses|progress|aktif|pelaksanaan/i.test(label))
+            return '#2780d9';
+          if (/belum mulai|belum|perencanaan|persiapan|pending|draft/i.test(label))
+            return '#d39a3c';
+          if (/tertunda|kendala|delay|terhambat/i.test(label))
+            return '#cc5a52';
+          if (/batal|cancel|gagal/i.test(label))
+            return '#87958d';
+
+          return palette[index % palette.length];
+        };
+
+        let angle = 0;
+
+        const segments = rows.map((row, index) => {
+          const start = angle;
+          angle += (row.count / total) * 360;
+          row.color = colorForStatus(row.label, index);
+
+          return `${row.color} ${start}deg ${angle}deg`;
+        }).join(', ');
+
+        const legend = rows.map(row => {
+          const percent = (row.count / total) * 100;
+
+          return `
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #edf2ef;">
+              <span style="width:9px;height:9px;border-radius:50%;background:${row.color};flex-shrink:0;"></span>
+              <span style="font-size:11px;color:#3b5148;flex:1;overflow-wrap:anywhere;">${esc(row.label)}</span>
+              <b style="font-size:11px;color:#163d2e;">${row.count}</b>
+              <span style="font-size:10px;color:#77877f;min-width:43px;text-align:right;">${percent.toFixed(1).replace('.', ',')}%</span>
+            </div>
+          `;
+        }).join('');
+
+        chart.innerHTML = `
+          <div style="width:100%;box-sizing:border-box;background:#f7faf7;border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;">
+              <div role="img" aria-label="Diagram donat distribusi status proyek"
+                style="width:154px;height:154px;max-width:42vw;border-radius:50%;background:conic-gradient(${segments});display:grid;place-items:center;flex-shrink:0;">
+                <div style="width:96px;height:96px;border-radius:50%;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <strong style="font-size:28px;color:#164c2f;">${total}</strong>
+                  <span style="font-size:10px;color:#78877f;">Total Proyek</span>
+                </div>
+              </div>
+
+              <div style="flex:1;min-width:170px;max-height:205px;overflow-y:auto;">
+                ${legend}
+              </div>
+            </div>
+
+            <div style="font-size:10px;color:#7a847d;text-align:center;margin-top:14px;">
+              Menampilkan ${total} proyek sesuai filter aktif.
+            </div>
+          </div>
+        `;
+      }
+      // =====================================
       // RENDER SEMUA
       // =====================================
 
@@ -3446,6 +3556,8 @@ projectCards
         renderKPI(list);
 
         renderFinancialChart(list);
+        
+        renderProgressChart(list);
 
         renderProjectCards(list);
 
